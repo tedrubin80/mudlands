@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-09-24T11:00:01.371Z",
+  "activeCharacters": [],
+  "storyState": {
+    "day": 1,
+    "currentPhase": "rebuilding",
+    "faction_tensions": {
+      "restoration_vs_adaptation": 50,
+      "human_vs_beastkin": 60,
+      "trust_in_council": 58,
+      "shadowblight_awareness": 20,
+      "religious_fervor": 40,
+      "economic_stability": 55
+    },
+    "active_plots": [
+      {
+        "id": "forgotten_deity_mystery",
+        "phase": "discovery",
+        "progress": 10,
+        "key_characters": [
+          "sister_morwyn"
+        ],
+        "next_trigger": "ancient_text_found"
+      },
+      {
+        "id": "shadowblight_infiltration",
+        "phase": "hidden",
+        "progress": 25,
+        "key_characters": [
+          "veiled_scholar"
+        ],
+        "next_trigger": "first_symptoms_appear"
+      },
+      {
+        "id": "beast_kin_integration",
+        "phase": "tension",
+        "progress": 30,
+        "key_characters": [
+          "razorclaw",
+          "elder_thaddeus"
+        ],
+        "next_trigger": "trade_agreement_proposed"
+      }
+    ],
+    "world_events": [],
+    "character_relationships": {
+      "elder_thaddeus": {
+        "grizelda_ironfoot": -20,
+        "razorclaw": 10,
+        "sister_morwyn": 30
+      },
+      "veiled_scholar": {
+        "all": 0,
+        "hidden_agenda": true
+      },
+      "razorclaw": {
+        "human_npcs": -30,
+        "beast_kin": 80
+      }
+    },
+    "milestone_triggers": {
+      "shadowblight_awareness_40": {
+        "triggered": false,
+        "event": "public_panic",
+        "description": "Citizens become aware of corruption threat"
+      },
+      "trust_in_council_30": {
+        "triggered": false,
+        "event": "civil_unrest",
+        "description": "Protests begin in town square"
+      },
+      "human_vs_beastkin_80": {
+        "triggered": false,
+        "event": "violent_confrontation",
+        "description": "Open conflict between species"
+      },
+      "restoration_vs_adaptation_80": {
+        "triggered": false,
+        "event": "faction_split",
+        "description": "Town divides into opposing camps"
+      }
+    },
+    "evolution_modifiers": {
+      "time_of_day": {
+        "morning": {
+          "economic_stability": 1
+        },
+        "evening": {
+          "human_vs_beastkin": -1
+        },
+        "night": {
+          "shadowblight_awareness": 1
+        }
+      },
+      "weather": {
+        "storms": {
+          "shadowblight_awareness": 2,
+          "religious_fervor": 1
+        },
+        "clear": {
+          "economic_stability": 1
+        },
+        "fog": {
+          "shadowblight_awareness": 3
+        }
+      }
+    }
+  },
+  "recentEvents": []
+}

@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "character_id": "sister_morwyn_001",
+    "created_date": "2025-09-22T02:50:00Z",
+    "status": "ready_for_testing",
+    "last_updated": "2025-09-22T02:50:00Z",
+    "creator": "ai_storyteller_v1",
+    "testing_assigned_to": null
+  },
+  "character_data": {
+    "name": "Sister Morwyn",
+    "title": "Keeper of the Forgotten Shrine",
+    "race": "Half-Elf",
+    "class": "Cleric/Scholar",
+    "level": 18,
+    "location": "forgotten_shrine",
+    "faction_allegiance": "Celestial Court - Seeking the Forgotten"
+  },
+  "story_integration": {
+    "lore_connection": "Morwyn discovered fragments of texts about the Forgotten deity while studying in the ruins of the Great Library. She believes this lost god's disappearance is connected to the Sundering and that rediscovering their identity might help heal the world.",
+    "story_function": "Provides divine magic services, offers clues about pre-Sundering religion, introduces the mystery of the Forgotten deity",
+    "plot_hooks": [
+      "Recovering lost religious artifacts",
+      "Deciphering ancient religious texts",
+      "Investigating divine manifestations",
+      "Countering Shadowblight with holy magic"
+    ],
+    "information_they_know": [
+      "Fragments of the Forgotten deity's true name",
+      "Locations of hidden pre-Sundering shrines",
+      "Rituals to purify Shadowblight corruption",
+      "Prophecies about the world's restoration"
+    ],
+    "conflicts_they_create": [
+      "Her obsession with the Forgotten makes others uncomfortable",
+      "Traditional clergy view her research as heretical",
+      "She sometimes prioritizes knowledge over safety",
+      "Her discoveries challenge established religious doctrine"
+    ]
+  },
+  "game_mechanics": {
+    "services_offered": [
+      "Healing services",
+      "Curse removal",
+      "Blessing rituals",
+      "Religious knowledge"
+    ],
+    "quests_available": [
+      {
+        "quest_id": "divine_quest_001",
+        "title": "Echoes of the Forgotten",
+        "description": "Retrieve a sacred text fragment from the Sunken Marshes ruins",
+        "level_requirement": 12,
+        "rewards": ["Experience: 900", "Gold: 100", "Blessed Amulet", "Divine Magic Training"]
+      },
+      {
+        "quest_id": "divine_quest_002",
+        "title": "Purification Ritual",
+        "description": "Gather sacred components to cleanse a Shadowblight-tainted area",
+        "level_requirement": 15,
+        "rewards": ["Experience: 1200", "Gold: 250", "Holy Water x5"]
+      }
+    ],
+    "dialogue_trees": {
+      "greeting": "Welcome, seeker. I sense you are drawn here by more than chance. The Forgotten calls to those who would remember what was lost. Perhaps you can help me piece together the shattered truth.",
+      "subsequent_meetings": "You return. Good. Each fragment we recover brings us closer to understanding. The other gods remember their sibling, even if mortals have forgotten.",
+      "quest_related": "This task is sacred work. We seek not just artifacts, but memories made manifest. Handle what you find with reverence - some truths are dangerous when incomplete.",
+      "lore_sharing": "Five gods we knew, but six there were. The Forgotten's name was erased from reality itself during the Sundering. I've found syllables... 'Vel...' perhaps 'Veil...' but speaking the full name might have consequences we cannot foresee."
+    }
+  },
+  "ai_behavior_config": {
+    "personality_traits": ["Mystical", "Obsessive", "Compassionate", "Scholarly"],
+    "speech_patterns": "Soft-spoken with occasional prophetic utterances, mixes academic precision with religious reverence, sometimes seems to hear voices others cannot",
+    "decision_making_style": "Faith-driven but scholarly, believes knowledge and faith together reveal truth",
+    "interaction_preferences": "Drawn to discuss theology and mysteries, provides healing freely, becomes animated when discussing the Forgotten",
+    "auto_play_instructions": "Spend time at the shrine in meditation, occasionally visit the library ruins, provide healing to injured NPCs, study ancient texts, sometimes stare at empty spaces as if seeing something others cannot"
+  },
+  "testing_checklist": {
+    "dialogue_testing": false,
+    "quest_mechanics": false,
+    "faction_interactions": false,
+    "combat_behavior": false,
+    "economy_integration": false,
+    "story_consistency": false,
+    "manual_approval": false
+  }
+}

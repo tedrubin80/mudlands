@@ -1,0 +1,330 @@
+{
+  "quests": [
+    {
+      "id": "welcome_to_elden",
+      "title": "Welcome to Elden",
+      "description": "Learn the basics of survival in this new world.",
+      "long_description": "As a newly arrived adventurer in Elden, you must familiarize yourself with the town and its people to begin your journey.",
+      "type": "tutorial",
+      "category": "main",
+      "difficulty": "easy",
+      "level_requirement": 1,
+      "narrative": {
+        "hook": "Welcome to Elden, brave adventurer! I'm Marcus, town guard. Let me show you the basics of survival.",
+        "background": "Every successful adventurer starts by understanding their surroundings and building relationships with the locals.",
+        "stakes": "Knowledge of the town could mean the difference between life and death in your adventures.",
+        "resolution": "Well done! You're ready to take on greater challenges. The world awaits!"
+      },
+      "giver": "guard_marcus",
+      "objectives": [
+        {
+          "id": "visit_market",
+          "type": "explore",
+          "description": "Visit the Market Street",
+          "target": "market_street",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "visit_training",
+          "type": "explore", 
+          "description": "Visit the Training Grounds",
+          "target": "training_grounds",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "talk_to_guard",
+          "type": "talk_to",
+          "description": "Speak with the Guard Captain",
+          "target": "guard_captain",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 50,
+        "gold": 10,
+        "items": [
+          {"id": "health_potion", "quantity": 3}
+        ]
+      },
+      "locations_involved": ["town_square", "market_street", "training_grounds"]
+    },
+    {
+      "id": "goblin_menace",
+      "title": "The Goblin Menace",
+      "description": "Clear out goblin scouts that have been harassing travelers.",
+      "long_description": "Goblin scouts have been growing bolder, attacking merchants and travelers on the roads around Aldoria. The town needs someone brave enough to deal with this threat before it gets worse.",
+      "type": "kill",
+      "category": "side",
+      "difficulty": "easy",
+      "level_requirement": 1,
+      "narrative": {
+        "hook": "Goblin scouts have been attacking travelers on the roads. Can you help us?",
+        "background": "These goblins are getting bolder each day, and our guards are spread too thin to patrol every road.",
+        "stakes": "If we don't stop them soon, trade routes will be compromised and the town will suffer.",
+        "resolution": "Excellent work! The roads are safer now, and merchants can travel without fear."
+      },
+      "giver": "guard_captain",
+      "prerequisites": {
+        "level": 1
+      },
+      "objectives": [
+        {
+          "id": "kill_goblins",
+          "type": "kill",
+          "description": "Defeat 3 Goblin Scouts",
+          "target": "goblin_scout",
+          "quantity": 3,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 75,
+        "gold": 25,
+        "items": [
+          {"id": "leather_boots", "quantity": 1}
+        ]
+      },
+      "locations_involved": ["crossroads", "deep_forest"]
+    },
+    {
+      "id": "herb_gathering",
+      "title": "Herb Gathering",
+      "description": "Collect healing herbs for the town alchemist.",
+      "long_description": "The town's alchemist is running low on essential herbs needed for healing potions. These herbs can be found growing wild in the forest areas around town.",
+      "type": "fetch",
+      "category": "side", 
+      "difficulty": "easy",
+      "level_requirement": 1,
+      "narrative": {
+        "hook": "I need someone to gather some herbs for my potions. Are you interested?",
+        "background": "These herbs are essential for creating healing potions that keep our adventurers alive.",
+        "stakes": "Without a steady supply of herbs, I can't help injured adventurers who come to me for aid.",
+        "resolution": "Perfect! These herbs are exactly what I needed. Fresh and potent!"
+      },
+      "giver": "town_alchemist",
+      "objectives": [
+        {
+          "id": "collect_herbs",
+          "type": "collect",
+          "description": "Collect 5 Herb Bundles",
+          "target": "herb_bundle", 
+          "quantity": 5,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 40,
+        "gold": 15,
+        "items": [
+          {"id": "health_potion", "quantity": 2}
+        ]
+      },
+      "repeatable": true,
+      "cooldown": 3600000,
+      "locations_involved": ["whispering_woods_entrance", "forest_clearing"]
+    },
+    {
+      "id": "wolves_in_the_woods",
+      "title": "Wolves in the Woods",
+      "description": "Investigate reports of aggressive wolves near town.",
+      "long_description": "Forest rangers have reported unusually aggressive wolf behavior in the Whispering Woods. Something is making them more dangerous than usual, and the town needs someone to investigate.",
+      "type": "kill",
+      "category": "main",
+      "difficulty": "normal",
+      "level_requirement": 2,
+      "prerequisites": {
+        "level": 2,
+        "quests_completed": ["welcome_to_aldoria"]
+      },
+      "narrative": {
+        "hook": "Travelers report aggressive wolves blocking the forest paths. This isn't normal behavior.",
+        "background": "These wolves are unusually aggressive and coordinated - something is definitely wrong in the woods.",
+        "stakes": "If left unchecked, they could form larger packs and threaten the town itself.",
+        "resolution": "Well done. The forest paths are clear once more, and hopefully the wolves will return to normal behavior."
+      },
+      "giver": "forest_ranger",
+      "objectives": [
+        {
+          "id": "kill_wolves", 
+          "type": "kill",
+          "description": "Defeat 2 Forest Wolves",
+          "target": "forest_wolf",
+          "quantity": 2,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "investigate_cave",
+          "type": "explore",
+          "description": "Investigate the Forest Clearing",
+          "target": "forest_clearing",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 100,
+        "gold": 40,
+        "items": [
+          {"id": "wolf_pelt_cloak", "quantity": 1}
+        ]
+      },
+      "locations_involved": ["whispering_woods_entrance", "forest_clearing", "deep_forest"]
+    },
+    {
+      "id": "spider_silk_collection",
+      "title": "Spider Silk Collection",
+      "description": "Collect spider silk for the town's weaver.",
+      "long_description": "The town weaver has received an order for fine silk garments, but needs high-quality spider silk. The giant spiders in the forest produce the best silk, but they're dangerous to approach.",
+      "type": "fetch",
+      "category": "side",
+      "difficulty": "normal", 
+      "level_requirement": 3,
+      "narrative": {
+        "hook": "I need spider silk for a special order, but the spiders are too dangerous for me to approach alone.",
+        "background": "Giant spider silk is incredibly strong and makes the finest thread for delicate garments.",
+        "stakes": "This order could bring prosperity to our weaving trade, but only if we can get the materials.",
+        "resolution": "Magnificent! This silk is exactly what I need. The client will be very pleased."
+      },
+      "giver": "town_weaver",
+      "prerequisites": {
+        "level": 3
+      },
+      "objectives": [
+        {
+          "id": "collect_silk",
+          "type": "collect",
+          "description": "Collect 3 Spider Silk bundles",
+          "target": "spider_silk",
+          "quantity": 3,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 80,
+        "gold": 35,
+        "items": [
+          {"id": "silk_gloves", "quantity": 1}
+        ]
+      },
+      "locations_involved": ["giant_spider_nest", "deep_forest"]
+    },
+    {
+      "id": "mountain_ore_delivery",
+      "title": "Mountain Ore Delivery",
+      "description": "Deliver iron ore from the mountains to the town blacksmith.",
+      "long_description": "The town blacksmith is running low on quality iron ore and has arranged for a shipment from the mountain mines. However, the roads are dangerous and he needs someone reliable to make the delivery.",
+      "type": "delivery",
+      "category": "side",
+      "difficulty": "normal",
+      "level_requirement": 3,
+      "narrative": {
+        "hook": "I need someone trustworthy to collect ore from the mountain miners and bring it back safely.",
+        "background": "The mountain ore is the finest quality, but bandits and monsters make the journey perilous.",
+        "stakes": "Without good ore, I can't make proper weapons and armor for the town's defenders.",
+        "resolution": "Excellent! This ore is perfect quality. Now I can get back to proper smithing work."
+      },
+      "giver": "town_blacksmith",
+      "prerequisites": {
+        "level": 3
+      },
+      "objectives": [
+        {
+          "id": "collect_ore",
+          "type": "collect", 
+          "description": "Collect Iron Ore from the mountains",
+          "target": "iron_ore",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "deliver_ore",
+          "type": "deliver",
+          "description": "Deliver the Iron Ore to the blacksmith",
+          "target": "town_blacksmith",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 90,
+        "gold": 30,
+        "items": [
+          {"id": "iron_sword", "quantity": 1}
+        ]
+      },
+      "locations_involved": ["rocky_foothills_path", "town_square"]
+    },
+    {
+      "id": "ancient_ruins_exploration",
+      "title": "Ancient Ruins Exploration",
+      "description": "Explore the mysterious ancient ruins and report back with findings.",
+      "long_description": "Strange lights and sounds have been reported coming from the ancient ruins to the north. The town scholar believes there may be valuable historical artifacts there, but it's too dangerous for civilians to investigate.",
+      "type": "explore",
+      "category": "main",
+      "difficulty": "hard",
+      "level_requirement": 4,
+      "prerequisites": {
+        "level": 4,
+        "quests_completed": ["wolves_in_the_woods"]
+      },
+      "narrative": {
+        "hook": "The ancient ruins have been showing signs of activity. We need someone brave enough to investigate.",
+        "background": "These ruins predate our town by centuries, and legend speaks of powerful artifacts hidden within.",
+        "stakes": "If there's something dangerous awakening in those ruins, the town needs to know about it.",
+        "resolution": "Fascinating discoveries! Your exploration has given us valuable insights into our region's ancient history."
+      },
+      "giver": "town_scholar",
+      "objectives": [
+        {
+          "id": "explore_ruins",
+          "type": "explore",
+          "description": "Thoroughly explore the Ancient Ruins",
+          "target": "old_ruins",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "defeat_guardian",
+          "type": "kill",
+          "description": "Defeat the Skeleton Warrior guardian",
+          "target": "skeleton_warrior",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        },
+        {
+          "id": "collect_artifact",
+          "type": "collect",
+          "description": "Collect an Ancient Scroll",
+          "target": "ancient_scroll",
+          "quantity": 1,
+          "current_progress": 0,
+          "completed": false
+        }
+      ],
+      "rewards": {
+        "experience": 150,
+        "gold": 60,
+        "items": [
+          {"id": "magic_crystal", "quantity": 1},
+          {"id": "ancient_knowledge_tome", "quantity": 1}
+        ]
+      },
+      "locations_involved": ["old_ruins"]
+    }
+  ]
+}
