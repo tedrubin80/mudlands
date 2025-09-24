@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MUDlands Connection Test</title>
+    <script src="https://mudlands.online/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>MUDlands Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="log"></div>
+    
+    <script>
+        const log = (msg) => {
+            document.getElementById('log').innerHTML += `<p>${new Date().toISOString()}: ${msg}</p>`;
+            console.log(msg);
+        };
+        
+        log('Starting connection test...');
+        
+        try {
+            const socket = io('https://mudlands.online', {
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: 5,
+                timeout: 10000,
+                transports: ['websocket', 'polling']
+            });
+            
+            socket.on('connect', () => {
+                log('✅ Connected successfully!');
+                document.getElementById('status').innerHTML = '<span style="color:green">CONNECTED</span>';
+            });
+            
+            socket.on('connected', (data) => {
+                log('✅ Received welcome message: ' + JSON.stringify(data));
+            });
+            
+            socket.on('disconnect', (reason) => {
+                log('❌ Disconnected: ' + reason);
+                document.getElementById('status').innerHTML = '<span style="color:red">DISCONNECTED</span>';
+            });
+            
+            socket.on('error', (error) => {
+                log('❌ Error: ' + error);
+            });
+            
+            socket.on('connect_error', (error) => {
+                log('❌ Connection error: ' + error.message);
+            });
+            
+        } catch (e) {
+            log('❌ Failed to initialize Socket.IO: ' + e.message);
+        }
+    </script>
+</body>
+</html>

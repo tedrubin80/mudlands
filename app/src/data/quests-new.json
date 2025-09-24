@@ -1,0 +1,321 @@
+{
+  "quests": [
+    {
+      "id": "welcome_to_elden",
+      "title": "Welcome to Elden",
+      "description": "Learn the basics of survival in this new world.",
+      "long_description": "As a newly arrived adventurer in Elden, you must familiarize yourself with the town and its people to begin your journey.",
+      "type": "tutorial",
+      "category": "main",
+      "difficulty": "easy",
+      "level_requirement": 1,
+      "narrative": {
+        "hook": "Welcome to Elden, brave adventurer! I'm Marcus, town guard. Let me show you the basics of survival.",
+        "background": "Every successful adventurer starts by understanding their surroundings and building relationships with the locals.",
+        "stakes": "Knowledge of the town could mean the difference between life and death in your adventures.",
+        "resolution": "Well done! You're ready to take on greater challenges. The world awaits!"
+      },
+      "giver": "guard_marcus",
+      "objectives": [
+        {
+          "id": "explore_market",
+          "type": "explore",
+          "description": "Visit the Market District",
+          "target": "market_district",
+          "quantity": 1
+        },
+        {
+          "id": "talk_to_innkeeper",
+          "type": "talk_to",
+          "description": "Speak with Sarah at the Inn",
+          "target": "innkeeper_sarah",
+          "quantity": 1
+        },
+        {
+          "id": "visit_training",
+          "type": "explore",
+          "description": "Check out the Training Grounds",
+          "target": "training_grounds",
+          "quantity": 1
+        }
+      ],
+      "rewards": {
+        "experience": 100,
+        "gold": 50,
+        "items": [
+          { "id": "health_potion", "quantity": 3 },
+          { "id": "bread", "quantity": 5 }
+        ]
+      },
+      "world_effects": [
+        {
+          "type": "npc_trust_change",
+          "target": "guard_marcus",
+          "effect": { "trust_change": 20 },
+          "condition": "quest_completed"
+        }
+      ]
+    },
+
+    {
+      "id": "the_missing_merchant",
+      "title": "The Missing Merchant",
+      "description": "A merchant has gone missing on the forest road. Investigate their disappearance.",
+      "long_description": "Elena's trading partner was supposed to arrive days ago but never showed up. She suspects foul play and needs someone to investigate the forest road.",
+      "type": "mystery",
+      "category": "main", 
+      "difficulty": "medium",
+      "level_requirement": 3,
+      "prerequisites": {
+        "level": 3,
+        "quests_completed": ["welcome_to_elden"]
+      },
+      "narrative": {
+        "hook": "My trading partner should have been here days ago. Something terrible must have happened on the forest road.",
+        "background": "The forest paths have been dangerous lately, with reports of bandits and worse creatures.",
+        "stakes": "If we can't secure the trade routes, Elden's economy will suffer greatly.",
+        "resolution": "Thank you for uncovering the truth. The roads are safer now, and we can resume trade."
+      },
+      "giver": "merchant_elena",
+      "locations_involved": ["forest_entrance", "deep_forest", "bandit_camp"],
+      "objectives": [
+        {
+          "id": "investigate_road",
+          "type": "explore",
+          "description": "Search the forest road for clues",
+          "target": "forest_entrance",
+          "quantity": 1
+        },
+        {
+          "id": "find_evidence",
+          "type": "collect",
+          "description": "Find evidence of what happened",
+          "target": "torn_merchant_ledger",
+          "quantity": 1
+        },
+        {
+          "id": "clear_bandits",
+          "type": "kill",
+          "description": "Defeat the Forest Bandits",
+          "target": "forest_bandit",
+          "quantity": 3
+        },
+        {
+          "id": "rescue_merchant",
+          "type": "talk_to",
+          "description": "Rescue the captured merchant",
+          "target": "captured_merchant",
+          "quantity": 1
+        }
+      ],
+      "rewards": {
+        "experience": 300,
+        "gold": 150,
+        "items": [
+          { "id": "merchant_signet_ring", "quantity": 1 },
+          { "id": "leather_armor", "quantity": 1 }
+        ],
+        "reputation": {
+          "merchants_guild": 25
+        }
+      }
+    },
+
+    {
+      "id": "ancient_magic_awakening",
+      "title": "Ancient Magic Awakening",
+      "description": "Strange magical energies are disrupting the land. The court wizard needs your help investigating.",
+      "long_description": "Aldric, the court wizard, has detected powerful magical disturbances emanating from the ancient ruins. This could be connected to the recent increase in monster activity.",
+      "type": "mystery",
+      "category": "main",
+      "difficulty": "hard",
+      "level_requirement": 5,
+      "prerequisites": {
+        "level": 5,
+        "quests_completed": ["the_missing_merchant"]
+      },
+      "narrative": {
+        "hook": "The magical energies I've been sensing grow stronger each day. Something ancient stirs in the old ruins.",
+        "background": "Long ago, powerful mages built these ruins to contain dangerous magical forces. Their seals may be weakening.",
+        "stakes": "If the ancient seals fail completely, the magical chaos could consume the entire region.",
+        "resolution": "Your bravery has prevented a magical catastrophe. The realm owes you a great debt."
+      },
+      "giver": "mage_aldric",
+      "locations_involved": ["mage_tower_study", "ancient_ruins", "sealed_chamber"],
+      "objectives": [
+        {
+          "id": "gather_components",
+          "type": "collect",
+          "description": "Gather 3 Mana Crystals from magical creatures",
+          "target": "mana_crystal",
+          "quantity": 3
+        },
+        {
+          "id": "explore_ruins",
+          "type": "explore",
+          "description": "Investigate the Ancient Ruins",
+          "target": "ancient_ruins_entrance",
+          "quantity": 1
+        },
+        {
+          "id": "defeat_guardian",
+          "type": "kill",
+          "description": "Defeat the Corrupted Stone Guardian",
+          "target": "corrupted_stone_guardian",
+          "quantity": 1
+        },
+        {
+          "id": "restore_seal",
+          "type": "use_item",
+          "description": "Use the Sealing Crystal on the Ancient Seal",
+          "target": "sealing_crystal",
+          "quantity": 1,
+          "location": "sealed_chamber"
+        }
+      ],
+      "rewards": {
+        "experience": 500,
+        "gold": 250,
+        "items": [
+          { "id": "staff_of_elements", "quantity": 1 },
+          { "id": "mage_robes", "quantity": 1 },
+          { "id": "scroll_of_protection", "quantity": 3 }
+        ],
+        "reputation": {
+          "mages_guild": 50
+        },
+        "unlocks": ["access_to_advanced_magic"]
+      }
+    },
+
+    {
+      "id": "herb_collection_daily",
+      "title": "Daily Herb Collection",
+      "description": "Collect healing herbs for the town's medical supplies.",
+      "type": "fetch",
+      "category": "daily",
+      "difficulty": "easy",
+      "level_requirement": 1,
+      "narrative": {
+        "hook": "I need fresh healing herbs for my potions. The forest always provides.",
+        "background": "Daily herb collection ensures we have enough supplies for injured adventurers.",
+        "stakes": "Without fresh herbs, our healing potions lose their potency.",
+        "resolution": "Perfect! These herbs will make excellent healing draughts."
+      },
+      "giver": "innkeeper_sarah",
+      "objectives": [
+        {
+          "id": "collect_healing_herbs",
+          "type": "collect",
+          "description": "Collect 8 Healing Herbs",
+          "target": "healing_herb",
+          "quantity": 8
+        }
+      ],
+      "rewards": {
+        "experience": 75,
+        "gold": 30,
+        "items": [
+          { "id": "health_potion", "quantity": 2 },
+          { "id": "antidote", "quantity": 1 }
+        ]
+      },
+      "repeatable": true,
+      "cooldown": 86400000,
+      "time_limit": 7200000
+    },
+
+    {
+      "id": "wolf_pack_menace",
+      "title": "Wolf Pack Menace",
+      "description": "A large wolf pack is threatening travelers on the northern road.",
+      "type": "kill",
+      "category": "side",
+      "difficulty": "medium",
+      "level_requirement": 3,
+      "narrative": {
+        "hook": "A massive wolf pack has claimed the northern road as their territory. Travelers are too frightened to pass.",
+        "background": "These wolves are larger and more aggressive than normal - something has made them desperate.",
+        "stakes": "Trade with northern settlements will cease if the road remains blocked.",
+        "resolution": "The road is clear! Travelers can once again pass safely to the north."
+      },
+      "giver": "guard_marcus",
+      "locations_involved": ["north_road", "wolf_den"],
+      "objectives": [
+        {
+          "id": "defeat_wolves",
+          "type": "kill",
+          "description": "Defeat Northern Wolves",
+          "target": "wolf",
+          "quantity": 6
+        },
+        {
+          "id": "defeat_alpha",
+          "type": "kill",
+          "description": "Defeat the Alpha Wolf",
+          "target": "dire_wolf",
+          "quantity": 1
+        }
+      ],
+      "rewards": {
+        "experience": 200,
+        "gold": 100,
+        "items": [
+          { "id": "wolf_hide_boots", "quantity": 1 },
+          { "id": "wolf_fang_necklace", "quantity": 1 }
+        ]
+      }
+    },
+
+    {
+      "id": "blacksmith_apprentice",
+      "title": "The Blacksmith's Apprentice",
+      "description": "Help Thorin the blacksmith with a special commission.",
+      "type": "fetch",
+      "category": "side",
+      "difficulty": "medium",
+      "level_requirement": 4,
+      "narrative": {
+        "hook": "I've got a special commission, but I need rare materials. Think ye can help an old smith?",
+        "background": "A visiting noble has commissioned a masterwork blade, but the materials are hard to come by.",
+        "stakes": "This commission could establish my reputation throughout the kingdom.",
+        "resolution": "Magnificent work! This blade will be the finest I've ever forged. Here's yer reward!"
+      },
+      "giver": "blacksmith_thorin",
+      "objectives": [
+        {
+          "id": "gather_iron_ore",
+          "type": "collect",
+          "description": "Find Iron Ore in the mountains",
+          "target": "iron_ore",
+          "quantity": 5
+        },
+        {
+          "id": "collect_coal",
+          "type": "collect",
+          "description": "Collect Coal for the forge",
+          "target": "coal",
+          "quantity": 10
+        },
+        {
+          "id": "deliver_materials",
+          "type": "deliver",
+          "description": "Deliver materials to Thorin",
+          "target": "blacksmith_thorin",
+          "quantity": 1
+        }
+      ],
+      "rewards": {
+        "experience": 350,
+        "gold": 200,
+        "items": [
+          { "id": "masterwork_dagger", "quantity": 1 },
+          { "id": "smithing_manual", "quantity": 1 }
+        ],
+        "reputation": {
+          "crafters_guild": 30
+        }
+      }
+    }
+  ]
+}

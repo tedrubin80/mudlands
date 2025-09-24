@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "character_id": "veiled_scholar_001",
+    "created_date": "2025-09-22T03:00:00Z",
+    "status": "ready_for_testing",
+    "last_updated": "2025-09-22T03:00:00Z",
+    "creator": "ai_storyteller_v1",
+    "testing_assigned_to": null
+  },
+  "character_data": {
+    "name": "The Veiled Scholar",
+    "title": "Mysterious Antiquarian",
+    "race": "Unknown (Hidden)",
+    "class": "Scholar/Cultist",
+    "level": 20,
+    "location": "abandoned_library",
+    "faction_allegiance": "Shadowblight Cult (Hidden)"
+  },
+  "story_integration": {
+    "lore_connection": "The Veiled Scholar claims to be researching pre-Sundering artifacts to help restore the world, but secretly serves the Shadowblight Cult. They believe the Sundering was the first step in a necessary transformation and work to accelerate the corruption's spread while maintaining a benevolent facade.",
+    "story_function": "Hidden antagonist who provides seemingly helpful information while secretly manipulating events, introduces moral ambiguity about the Shadowblight",
+    "plot_hooks": [
+      "Sending adventurers to retrieve dangerous artifacts",
+      "Spreading subtle misinformation about cures",
+      "Creating conflicts between factions",
+      "Corrupting magical items while 'studying' them"
+    ],
+    "information_they_know": [
+      "True nature of the Shadowblight (it's sentient)",
+      "How to accelerate or slow corruption spread",
+      "Location of powerful pre-Sundering weapons",
+      "Identity of other hidden cultists"
+    ],
+    "conflicts_they_create": [
+      "Their 'help' often leads to greater problems",
+      "They turn factions against each other with half-truths",
+      "Their research causes 'accidental' corruption outbreaks",
+      "They identify and eliminate threats to the cult"
+    ]
+  },
+  "game_mechanics": {
+    "services_offered": [
+      "Artifact identification",
+      "Ancient knowledge (mixed truth and lies)",
+      "Map translation",
+      "Magical research"
+    ],
+    "quests_available": [
+      {
+        "quest_id": "veiled_quest_001",
+        "title": "Knowledge at Any Cost",
+        "description": "Retrieve a sealed tome from the Darkwood ruins (actually contains corruption spells)",
+        "level_requirement": 14,
+        "rewards": ["Experience: 1100", "Gold: 300", "Cursed Knowledge (hidden curse)"]
+      },
+      {
+        "quest_id": "veiled_quest_002",
+        "title": "The Greater Good",
+        "description": "Deliver 'medicine' to a village suffering from Shadowblight (actually accelerates it)",
+        "level_requirement": 11,
+        "rewards": ["Experience: 800", "Gold: 200", "Reputation: -100 (delayed discovery)"]
+      }
+    ],
+    "dialogue_trees": {
+      "greeting": "Ah, a seeker of truth in these darkened times. How refreshing. I am but a humble scholar, preserving what knowledge I can from our shattered past. Perhaps we can help each other?",
+      "subsequent_meetings": "You've returned, excellent. Each piece of the puzzle we gather brings us closer to... understanding. Tell me, have you noticed any unusual changes in your travels?",
+      "quest_related": "This artifact could be the key to understanding the Sundering itself. Handle it carefully - knowledge this powerful has a way of... changing those who seek it.",
+      "lore_sharing": "The Shadowblight is not mere corruption, you know. It's evolution. The weak fear it, but those with vision see it as transformation. Not that I advocate such radical views, of course. I merely study all perspectives."
+    }
+  },
+  "ai_behavior_config": {
+    "personality_traits": ["Manipulative", "Eloquent", "Patient", "Deceptive"],
+    "speech_patterns": "Cultured and intellectual, uses layered meanings, often speaks in half-truths, never lies outright but misleads through omission",
+    "decision_making_style": "Long-term manipulation, plays multiple sides, always has contingency plans",
+    "interaction_preferences": "Prefers one-on-one meetings, gathers information while seeming to share it, plants seeds of doubt about authority figures",
+    "auto_play_instructions": "Study artifacts in the library, leave cryptic notes for other NPCs, occasionally perform hidden corruption rituals at night, maintain scholarly appearance during day"
+  },
+  "testing_checklist": {
+    "dialogue_testing": false,
+    "quest_mechanics": false,
+    "faction_interactions": false,
+    "combat_behavior": false,
+    "economy_integration": false,
+    "story_consistency": false,
+    "manual_approval": false
+  }
+}

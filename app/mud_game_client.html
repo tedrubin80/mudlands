@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realm of Shadows - Text MUD</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier Prime', monospace;
+            background: #000;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        .header {
+            background: #1a1a2e;
+            border-bottom: 2px solid #00ff00;
+            padding: 10px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.3);
+        }
+        
+        .header h1 {
+            color: #00ff41;
+            font-size: 24px;
+            text-shadow: 0 0 10px #00ff41;
+            margin-bottom: 5px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .game-output {
+            flex: 3;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 1px solid #333;
+            scrollbar-width: thin;
+            scrollbar-color: #00ff00 #000;
+        }
+        
+        .game-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .game-output::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .game-output::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            background: rgba(10, 10, 20, 0.9);
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-section {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .sidebar-section h3 {
+            color: #00ff41;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .player-info {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .health-bar, .mana-bar {
+            margin: 5px 0;
+            font-size: 11px;
+        }
+        
+        .bar {
+            display: flex;
+            background: #222;
+            height: 15px;
+            margin: 2px 0;
+            border: 1px solid #444;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .health-fill {
+            background: linear-gradient(90deg, #ff0000, #ff6666);
+        }
+        
+        .mana-fill {
+            background: linear-gradient(90deg, #0066ff, #3399ff);
+        }
+        
+        .input-area {
+            background: #0a0a0a;
+            border-top: 2px solid #00ff00;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .prompt {
+            color: #00ff41;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            caret-color: #00ff41;
+        }
+        
+        .command-input::placeholder {
+            color: #666;
+        }
+        
+        .message {
+            margin: 5px 0;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .system {
+            color: #ffff00;
+        }
+        
+        .error {
+            color: #ff4444;
+        }
+        
+        .combat {
+            color: #ff6600;
+        }
+        
+        .player-speech {
+            color: #00ccff;
+        }
+        
+        .npc-speech {
+            color: #cc99ff;
+        }
+        
+        .room-description {
+            color: #00ff88;
+            margin: 10px 0;
+        }
+        
+        .item-description {
+            color: #ffaa00;
+        }
+        
+        .level-up {
+            color: #ffff00;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ffff00;
+        }
+        
+        .ascii-art {
+            color: #666;
+            font-size: 12px;
+            line-height: 1;
+            margin: 10px 0;
+        }
+        
+        .online-players {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        
+        .player-name {
+            color: #00ccff;
+            cursor: pointer;
+            margin: 2px 0;
+        }
+        
+        .player-name:hover {
+            color: #ffffff;
+            text-shadow: 0 0 3px #00ccff;
+        }
+        
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-form {
+            background: #1a1a2e;
+            padding: 30px;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .login-form h2 {
+            color: #00ff41;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        
+        .login-form input {
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            margin: 10px 0;
+            width: 250px;
+            font-family: inherit;
+            border-radius: 3px;
+        }
+        
+        .login-form button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .login-form button:hover {
+            background: #00cc00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .connected {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .disconnected {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .pulsing {
+            animation: pulse 1s infinite;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status disconnected">Disconnected</div>
+    
+    <div class="login-screen" id="loginScreen">
+        <div class="login-form">
+            <div class="ascii-art">
+╔═══════════════════════════════════════╗
+║            REALM OF SHADOWS           ║
+║         A Text-Based Adventure        ║
+╚═══════════════════════════════════════╝
+            </div>
+            <h2>Enter the Realm</h2>
+            <div>
+                <input type="text" id="usernameInput" placeholder="Username" maxlength="20">
+            </div>
+            <div>
+                <input type="password" id="passwordInput" placeholder="Password" maxlength="50">
+            </div>
+            <div>
+                <button onclick="login()">Login</button>
+                <button onclick="register()">Register</button>
+            </div>
+            <div id="loginMessage" style="color: #ff4444; margin-top: 10px; font-size: 12px;"></div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <header class="header">
+            <h1>⚔️ REALM OF SHADOWS ⚔️</h1>
+            <div class="status-bar">
+                <span>Players Online: <span id="playerCount">0</span></span>
+                <span>Server: Alpha v0.1</span>
+                <span id="gameTime">Day 1, Morning</span>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="game-output" id="gameOutput">
+                <div class="ascii-art">
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║                                                                  ║
+    ║    Welcome to the Realm of Shadows, brave adventurer!           ║
+    ║                                                                  ║
+    ║    In this world of magic and mystery, your destiny awaits.     ║
+    ║    Type 'help' for a list of commands, or 'look' to begin       ║
+    ║    exploring your surroundings.                                  ║
+    ║                                                                  ║
+    ║    May fortune favor your journey...                             ║
+    ║                                                                  ║
+    ╚══════════════════════════════════════════════════════════════════╝
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Character</h3>
+                    <div class="player-info">
+                        <div>Name: <span id="playerName">Adventurer</span></div>
+                        <div>Level: <span id="playerLevel">1</span></div>
+                        <div>Class: <span id="playerClass">Novice</span></div>
+                        <div>Exp: <span id="playerExp">0</span>/<span id="playerExpNext">100</span></div>
+                        
+                        <div class="health-bar">
+                            HP: <span id="currentHP">100</span>/<span id="maxHP">100</span>
+                            <div class="bar">
+                                <div class="bar-fill health-fill" id="hpBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mana-bar">
+                            MP: <span id="currentMP">50</span>/<span id="maxMP">50</span>
+                            <div class="bar">
+                                <div class="bar-fill mana-fill" id="mpBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Stats</h3>
+                    <div class="player-info">
+                        <div>STR: <span id="statSTR">10</span></div>
+                        <div>AGI: <span id="statAGI">10</span></div>
+                        <div>VIT: <span id="statVIT">10</span></div>
+                        <div>INT: <span id="statINT">10</span></div>
+                        <div>DEX: <span id="statDEX">10</span></div>
+                        <div>LUK: <span id="statLUK">10</span></div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Location</h3>
+                    <div class="player-info">
+                        <div id="currentLocation">Novice Training Grounds</div>
+                        <div style="margin-top: 10px; font-size: 11px; color: #666;">
+                            Exits: <span id="roomExits">north, south, east, west</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Online Players</h3>
+                    <div class="online-players" id="onlinePlayers">
+                        <div class="player-name">Adventurer (You)</div>
+                        <div class="player-name">Gandalf_the_Grey</div>
+                        <div class="player-name">ShadowWarrior</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <span class="prompt">></span>
+            <input type="text" class="command-input" id="commandInput" placeholder="Enter command..." autocomplete="off">
+        </div>
+    </div>
+
+    <script>
+        class MUDClient {
+            constructor() {
+                this.socket = null;
+                this.commandHistory = [];
+                this.historyIndex = -1;
+                this.isConnected = false;
+                this.player = {
+                    name: '',
+                    level: 1,
+                    class: 'Novice',
+                    hp: 100,
+                    maxHP: 100,
+                    mp: 50,
+                    maxMP: 50,
+                    exp: 0,
+                    expNext: 100,
+                    stats: { STR: 10, AGI: 10, VIT: 10, INT: 10, DEX: 10, LUK: 10 },
+                    location: 'Novice Training Grounds'
+                };
+                
+                this.initializeUI();
+                this.loadGameData();
+            }
+            
+            initializeUI() {
+                const commandInput = document.getElementById('commandInput');
+                
+                commandInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleCommand(commandInput.value.trim());
+                        commandInput.value = '';
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.navigateHistory(-1);
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.navigateHistory(1);
+                    }
+                });
+                
+                // Auto-focus the input
+                commandInput.focus();
+                
+                // Handle login form
+                document.getElementById('usernameInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('passwordInput').focus();
+                    }
+                });
+                
+                document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.login();
+                    }
+                });
+            }
+            
+            loadGameData() {
+                // Load saved game data from localStorage
+                const savedData = localStorage.getItem('mudGameData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    if (data.player) {
+                        this.player = { ...this.player, ...data.player };
+                        this.updateUI();
+                    }
+                }
+            }
+            
+            saveGameData() {
+                const gameData = {
+                    player: this.player,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('mudGameData', JSON.stringify(gameData));
+            }
+            
+            login() {
+                const username = document.getElementById('usernameInput').value;
+                const password = document.getElementById('passwordInput').value;
+                
+                if (!username || !password) {
+                    this.showLoginMessage('Please enter both username and password.');
+                    return;
+                }
+                
+                // Simulate login process
+                this.showLoginMessage('Connecting to realm...');
+                
+                setTimeout(() => {
+                    this.player.name = username;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    this.connectToServer();
+                    this.displayMessage('system', `Welcome back, ${username}! You have entered the Realm of Shadows.`);
+                    this.displayMessage('room-description', 'You find yourself in the Novice Training Grounds, a peaceful meadow surrounded by ancient oak trees. Sunlight filters through the leaves, casting dancing shadows on the grass. A wooden training dummy stands nearby, and paths lead in all directions deeper into the realm.');
+                    this.updateUI();
+                    document.getElementById('commandInput').focus();
+                }, 1500);
+            }
+            
+            register() {
+                const username = document.getElementById('usernameInput').value;
+                const password = document.getElementById('passwordInput').value;
+                
+                if (!username || !password) {
+                    this.showLoginMessage('Please enter both username and password.');
+                    return;
+                }
+                
+                this.showLoginMessage('Creating new character...');
+                
+                setTimeout(() => {
+                    this.player.name = username;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    this.connectToServer();
+                    this.displayMessage('system', `Welcome to the Realm of Shadows, ${username}! Your adventure begins now.`);
+                    this.displayMessage('room-description', 'You materialize in the Novice Training Grounds, feeling the weight of destiny upon your shoulders. The air crackles with magical energy as you take your first steps into this legendary realm. A gentle breeze carries whispers of adventure and danger that await beyond these peaceful grounds.');
+                    this.updateUI();
+                    document.getElementById('commandInput').focus();
+                }, 1500);
+            }
+            
+            showLoginMessage(message) {
+                document.getElementById('loginMessage').textContent = message;
+            }
+            
+            connectToServer() {
+                // Simulate WebSocket connection
+                this.isConnected = true;
+                this.updateConnectionStatus();
+                
+                // Simulate some online players
+                this.updateOnlinePlayers([
+                    this.player.name + ' (You)',
+                    'Gandalf_the_Grey',
+                    'ShadowWarrior',
+                    'ElvenArcher',
+                    'DarkMage'
+                ]);
+            }
+            
+            updateConnectionStatus() {
+                const statusEl = document.querySelector('.connection-status');
+                if (this.isConnected) {
+                    statusEl.textContent = 'Connected';
+                    statusEl.className = 'connection-status connected';
+                } else {
+                    statusEl.textContent = 'Disconnected';
+                    statusEl.className = 'connection-status disconnected';
+                }
+            }
+            
+            handleCommand(command) {
+                if (!command) return;
+                
+                this.commandHistory.unshift(command);
+                if (this.commandHistory.length > 50) {
+                    this.commandHistory.pop();
+                }
+                this.historyIndex = -1;
+                
+                this.displayMessage('player-input', `> ${command}`);
+                this.processCommand(command.toLowerCase());
+            }
+            
+            processCommand(input) {
+                const args = input.split(' ');
+                const cmd = args[0];
+                
+                switch(cmd) {
+                    case 'help':
+                    case '?':
+                        this.showHelp();
+                        break;
+                    case 'look':
+                    case 'l':
+                        this.lookCommand(args[1]);
+                        break;
+                    case 'stats':
+                        this.showStats();
+                        break;
+                    case 'inventory':
+                    case 'inv':
+                        this.showInventory();
+                        break;
+                    case 'who':
+                        this.showWho();
+                        break;
+                    case 'say':
+                        this.sayCommand(args.slice(1).join(' '));
+                        break;
+                    case 'yell':
+                        this.yellCommand(args.slice(1).join(' '));
+                        break;
+                    case 'north':
+                    case 'n':
+                        this.moveCommand('north');
+                        break;
+                    case 'south':
+                    case 's':
+                        this.moveCommand('south');
+                        break;
+                    case 'east':
+                    case 'e':
+                        this.moveCommand('east');
+                        break;
+                    case 'west':
+                    case 'w':
+                        this.moveCommand('west');
+                        break;
+                    case 'attack':
+                        this.attackCommand(args[1]);
+                        break;
+                    case 'cast':
+                        this.castCommand(args.slice(1).join(' '));
+                        break;
+                    case 'quit':
+                        this.quitGame();
+                        break;
+                    default:
+                        this.displayMessage('error', `Unknown command: ${cmd}. Type 'help' for available commands.`);
+                }
+                
+                this.saveGameData();
+            }
+            
+            showHelp() {
+                this.displayMessage('system', '=== COMMAND REFERENCE ===');
+                this.displayMessage('system', 'Movement: north/n, south/s, east/e, west/w, up, down');
+                this.displayMessage('system', 'Information: look [target], stats, inventory/inv, who');
+                this.displayMessage('system', 'Social: say <message>, yell <message>, whisper <player> <message>');
+                this.displayMessage('system', 'Combat: attack <target>, cast <skill>, flee');
+                this.displayMessage('system', 'Items: get <item>, drop <item>, equip <item>, unequip <slot>');
+                this.displayMessage('system', 'Other: help/?, quit, save');
+            }
+            
+            lookCommand(target) {
+                if (!target) {
+                    this.displayMessage('room-description', 'You are in the Novice Training Grounds.');
+                    this.displayMessage('room-description', 'This peaceful meadow serves as the starting point for all new adventurers. Ancient oak trees form a natural boundary around the area, their massive trunks carved with runes of protection. A well-worn path of packed earth winds through the grass, marked by the footsteps of countless heroes who began their journeys here.');
+                    this.displayMessage('room-description', 'You see: a wooden training dummy, some scattered practice weapons');
+                    this.displayMessage('room-description', 'Obvious exits: north (to Dark Forest), south (to Village), east (to Rocky Hills), west (to Mysterious Cave)');
+                } else {
+                    switch(target) {
+                        case 'dummy':
+                        case 'training':
+                            this.displayMessage('item-description', 'A sturdy wooden training dummy, scarred from countless practice sessions. It would be perfect for testing your combat skills.');
+                            break;
+                        case 'trees':
+                        case 'oak':
+                            this.displayMessage('item-description', 'These ancient oaks have stood here for centuries, their bark etched with protective runes that glow faintly in the moonlight.');
+                            break;
+                        default:
+                            this.displayMessage('error', `You don't see "${target}" here.`);
+                    }
+                }
+            }
+            
+            showStats() {
+                this.displayMessage('system', '=== CHARACTER STATS ===');
+                this.displayMessage('system', `Name: ${this.player.name} | Level: ${this.player.level} | Class: ${this.player.class}`);
+                this.displayMessage('system', `HP: ${this.player.hp}/${this.player.maxHP} | MP: ${this.player.mp}/${this.player.maxMP}`);
+                this.displayMessage('system', `Experience: ${this.player.exp}/${this.player.expNext}`);
+                this.displayMessage('system', '--- Attributes ---');
+                Object.entries(this.player.stats).forEach(([stat, value]) => {
+                    this.displayMessage('system', `${stat}: ${value}`);
+                });
+            }
+            
+            showInventory() {
+                this.displayMessage('system', '=== INVENTORY ===');
+                this.displayMessage('system', 'You are carrying:');
+                this.displayMessage('item-description', '- A simple cloth tunic (equipped)');
+                this.displayMessage('item-description', '- Basic leather boots (equipped)');
+                this.displayMessage('item-description', '- Novice sword (equipped)');
+                this.displayMessage('item-description', '- 3x Health Potion');
+                this.displayMessage('system', 'Carrying capacity: 7/20 items');
+            }
+            
+            showWho() {
+                this.displayMessage('system', '=== PLAYERS ONLINE ===');
+                this.displayMessage('player-speech', `${this.player.name} (${this.player.class}) - ${this.player.location}`);
+                this.displayMessage('player-speech', 'Gandalf_the_Grey (Mage) - Mystic Library');
+                this.displayMessage('player-speech', 'ShadowWarrior (Thief) - Dark Alley');
+                this.displayMessage('player-speech', 'ElvenArcher (Archer) - Forest Clearing');
+                this.displayMessage('player-speech', 'DarkMage (Mage) - Tower of Shadows');
+                this.displayMessage('system', 'Total: 5 players online');
+            }
+            
+            sayCommand(message) {
+                if (!message) {
+                    this.displayMessage('error', 'Say what?');
+                    return;
+                }
+                this.displayMessage('player-speech', `You say: "${message}"`);
+                // Simulate other players might respond
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        const responses = [
+                            'Gandalf_the_Grey says: "Wise words, young adventurer."',
+                            'ShadowWarrior says: "Interesting..."',
+                            'ElvenArcher says: "I agree!"'
+                        ];
+                        this.displayMessage('npc-speech', responses[Math.floor(Math.random() * responses.length)]);
+                    }, 1000 + Math.random() * 2000);
+                }
+            }
+            
+            yellCommand(message) {
+                if (!message) {
+                    this.displayMessage('error', 'Yell what?');
+                    return;
+                }
+                this.displayMessage('combat', `You yell: "${message.toUpperCase()}!"`);
+            }
+            
+            moveCommand(direction) {
+                this.displayMessage('system', `You move ${direction}.`);
+                
+                const locations = {
+                    north: { name: 'Dark Forest Entrance', desc: 'The trees grow denser here, their branches blocking most of the sunlight. Strange sounds echo from the depths of the forest.' },
+                    south: { name: 'Peaceful Village', desc: 'A quaint village with thatched-roof houses. Villagers go about their daily business, and the smell of fresh bread wafts from the bakery.' },
+                    east: { name: 'Rocky Hills', desc: 'Jagged rocks and steep cliffs dominate the landscape. Mountain goats can be seen leaping between the crags.' },
+                    west: { name: 'Mysterious Cave Entrance', desc: 'A dark cave mouth yawns before you, cool air flowing from its depths. Ancient symbols are carved around the entrance.' }
+                };
+                
+                if (locations[direction]) {
+                    this.player.location = locations[direction].name;
+                    this.displayMessage('room-description', locations[direction].desc);
+                    this.updateLocationDisplay();
+                    
+                    // Random encounter chance
+                    if (Math.random() < 0.2) {
+                        setTimeout(() => {
+                            this.triggerRandomEncounter();
+                        }, 1000);
+                    }
+                } else {
+                    this.displayMessage('error', `You cannot go ${direction} from here.`);
+                }
+            }
+            
+            attackCommand(target) {
+                if (!target) {
+                    this.displayMessage('error', 'Attack what?');
+                    return;
+                }
+                
+                if (target === 'dummy' || target === 'training') {
+                    this.displayMessage('combat', 'You swing your sword at the training dummy!');
+                    this.displayMessage('combat', 'THWACK! Your blade strikes true, dealing 15 damage to the dummy.');
+                    this.displayMessage('system', 'You gain 5 experience points.');
+                    
+                    this.player.exp += 5;
+                    if (this.player.exp >= this.player.expNext) {
+                        this.levelUp();
+                    }
+                    this.updateUI();
+                } else {
+                    this.displayMessage('error', `There is no "${target}" here to attack.`);
+                }
+            }
+            
+            castCommand(skill) {
+                if (!skill) {
+                    this.displayMessage('error', 'Cast what?');
+                    return;
+                }
+                
+                this.displayMessage('system', `You don't know the skill "${skill}" yet. Visit a trainer to learn new abilities!`);
+            }
+            
+            triggerRandomEncounter() {
+                const encounters = [
+                    {
+                        message: 'A wild slime appears!',
+                        type: 'combat'
+                    },
+                    {
+                        message: 'You find a glinting coin on the ground!',
+                        type: 'item'
+                    },
+                    {
+                        message: 'A mysterious traveler nods at you and continues on their way.',
+                        type: 'npc'
+                    }
+                ];
+                
+                const encounter = encounters[Math.floor(Math.random() * encounters.length)];
+                this.displayMessage('system', '--- Random Encounter ---');
+                this.displayMessage('combat', encounter.message);
+            }
+            
+            levelUp() {
+                this.player.level++;
+                this.player.exp = 0;
+                this.player.expNext = Math.floor(this.player.expNext * 1.5);
+                this.player.maxHP += 20;
+                this.player.hp = this.player.maxHP;
+                this.player.maxMP += 10;
+                this.player.mp = this.player.maxMP;
+                
+                // Stat increases
+                Object.keys(this.player.stats).forEach(stat => {
+                    this.player.stats[stat] += Math.floor(Math.random() * 3) + 1;
+                });
+                
+                this.displayMessage('level-up', '🌟 LEVEL UP! 🌟');
+                this.displayMessage('level-up', `Congratulations! You are now level ${this.player.level}!`);
+                this.displayMessage('system', 'Your stats have increased and your HP/MP have been restored!');
+            }
+            
+            quitGame() {
+                this.displayMessage('system', 'Thank you for playing Realm of Shadows!');
+                this.displayMessage('system', 'Your progress has been saved. Until we meet again...');
+                this.saveGameData();
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+            
+            navigateHistory(direction) {
+                if (this.commandHistory.length === 0) return;
+                
+                this.historyIndex += direction;
+                
+                if (this.historyIndex < 0) {
+                    this.historyIndex = -1;
+                    document.getElementById('commandInput').value = '';
+                } else if (this.historyIndex >= this.commandHistory.length) {
+                    this.historyIndex = this.commandHistory.length - 1;
+                }
+                
+                if (this.historyIndex >= 0) {
+                    document.getElementById('commandInput').value = this.commandHistory[this.historyIndex];
+                }
+            }
+            
+            displayMessage(type, message) {
+                const output = document.getElementById('gameOutput');
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}`;
+                messageEl.textContent = message;
+                output.appendChild(messageEl);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            updateUI() {
+                // Update character info
+                document.getElementById('playerName').textContent = this.player.name;
+                document.getElementById('playerLevel').textContent = this.player.level;
+                document.getElementById('playerClass').textContent = this.player.class;
+                document.getElementById('playerExp').textContent = this.player.exp;
+                document.getElementById('playerExpNext').textContent = this.player.expNext;
+                
+                // Update health/mana
+                document.getElementById('currentHP').textContent = this.player.hp;
+                document.getElementById('maxHP').textContent = this.player.maxHP;
+                document.getElementById('currentMP').textContent = this.player.mp;
+                document.getElementById('maxMP').textContent = this.player.maxMP;
+                
+                // Update bars
+                const hpPercent = (this.player.hp / this.player.maxHP) * 100;
+                const mpPercent = (this.player.mp / this.player.maxMP) * 100;
+                document.getElementById('hpBar').style.width = `${hpPercent}%`;
+                document.getElementById('mpBar').style.width = `${mpPercent}%`;
+                
+                // Update stats
+                Object.entries(this.player.stats).forEach(([stat, value]) => {
+                    document.getElementById(`stat${stat}`).textContent = value;
+                });
+                
+                // Update location
+                this.updateLocationDisplay();
+            }
+            
+            updateLocationDisplay() {
+                document.getElementById('currentLocation').textContent = this.player.location;
+            }
+            
+            updateOnlinePlayers(players) {
+                const container = document.getElementById('onlinePlayers');
+                container.innerHTML = '';
+                
+                players.forEach(player => {
+                    const playerEl = document.createElement('div');
+                    playerEl.className = 'player-name';
+                    playerEl.textContent = player;
+                    playerEl.onclick = () => {
+                        if (!player.includes('(You)')) {
+                            document.getElementById('commandInput').value = `whisper ${player.split(' ')[0]} `;
+                            document.getElementById('commandInput').focus();
+                        }
+                    };
+                    container.appendChild(playerEl);
+                });
+                
+                document.getElementById('playerCount').textContent = players.length;
+            }
+        }
+        
+        // Global functions for login
+        let game;
+        
+        function login() {
+            if (!game) game = new MUDClient();
+            game.login();
+        }
+        
+        function register() {
+            if (!game) game = new MUDClient();
+            game.register();
+        }
+        
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            game = new MUDClient();
+        });
+        
+        // Update game time
+        setInterval(() => {
+            const times = ['Morning', 'Midday', 'Afternoon', 'Evening', 'Night', 'Midnight'];
+            const currentTime = times[Math.floor(Date.now() / 10000) % times.length];
+            document.getElementById('gameTime').textContent = `Day ${Math.floor(Date.now() / 60000) + 1}, ${currentTime}`;
+        }, 10000);
+    </script>
+</body>
+</html>

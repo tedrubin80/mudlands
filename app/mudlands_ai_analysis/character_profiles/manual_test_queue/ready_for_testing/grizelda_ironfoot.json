@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "character_id": "grizelda_ironfoot_001",
+    "created_date": "2025-09-22T03:05:00Z",
+    "status": "ready_for_testing",
+    "last_updated": "2025-09-22T03:05:00Z",
+    "creator": "ai_storyteller_v1",
+    "testing_assigned_to": null
+  },
+  "character_data": {
+    "name": "Grizelda Ironfoot",
+    "title": "Dwarven Mining Foreman",
+    "race": "Dwarf",
+    "class": "Engineer/Miner",
+    "level": 16,
+    "location": "mountain_mining_camp",
+    "faction_allegiance": "Ironkin Mining Consortium - Restorationist"
+  },
+  "story_integration": {
+    "lore_connection": "Grizelda's clan survived the Sundering in deep mountain holds. She leads expeditions to recover pre-Sundering technology and believes that restoring the old magitech devices is the key to healing the world. Her miners have uncovered disturbing things in the deep.",
+    "story_function": "Provides access to mining areas, shares knowledge about pre-Sundering technology, represents the restorationist philosophy",
+    "plot_hooks": [
+      "Clearing monster-infested mine shafts",
+      "Recovering ancient dwarven technology",
+      "Investigating strange sounds from the deep",
+      "Establishing new trade routes through mountains"
+    ],
+    "information_they_know": [
+      "Location of intact pre-Sundering facilities",
+      "How to repair magitech devices",
+      "What lurks in the deepest tunnels",
+      "Secret dwarven paths through the mountains"
+    ],
+    "conflicts_they_create": [
+      "Her restoration efforts sometimes awaken dangers",
+      "Conflicts with adaptationists over technology use",
+      "Suspicious of magic users after the Sundering",
+      "Competition over valuable mining rights"
+    ]
+  },
+  "game_mechanics": {
+    "services_offered": [
+      "Mining equipment",
+      "Ore refinement",
+      "Technology repair",
+      "Mountain guide services"
+    ],
+    "quests_available": [
+      {
+        "quest_id": "mining_quest_001",
+        "title": "Echoes from Below",
+        "description": "Investigate strange singing coming from the abandoned Deep Warren mine",
+        "level_requirement": 15,
+        "rewards": ["Experience: 1300", "Gold: 350", "Dwarven Mining Pick", "Access to Deep Mines"]
+      },
+      {
+        "quest_id": "mining_quest_002",
+        "title": "The Old Machines",
+        "description": "Help repair an ancient extraction device found in the ruins",
+        "level_requirement": 12,
+        "rewards": ["Experience: 950", "Gold: 275", "Magitech Components"]
+      }
+    ],
+    "dialogue_trees": {
+      "greeting": "Ach, surface dweller! Come to see how real work is done, have ye? The mountains remember what the surface forgot. We dig deep enough, we'll find the answers to fix this broken world.",
+      "subsequent_meetings": "Back again? Good! These tunnels don't clear themselves, and the old machines won't repair without proper help. The restoration begins underground, mark my words.",
+      "quest_related": "Listen close now. The deeps have been whispering lately. My miners won't go past the third level. Whatever's down there, it's older than the Sundering. We need someone with more courage than sense.",
+      "lore_sharing": "The Sundering shook even our deepest holds. But we dwarves, we remember. We've kept the old ways alive. Magic failed, but good solid engineering? That endures. We just need to dig up enough of it."
+    }
+  },
+  "ai_behavior_config": {
+    "personality_traits": ["Stubborn", "Pragmatic", "Traditional", "Protective"],
+    "speech_patterns": "Gruff dwarven accent, uses mining metaphors, dismissive of pure magic, proud of dwarven accomplishments",
+    "decision_making_style": "Tradition and proven methods over innovation, values hard work and determination",
+    "interaction_preferences": "Respects those who prove themselves through action, dislikes lengthy discussions, appreciates directness",
+    "auto_play_instructions": "Supervise mining operations, inspect equipment, argue with magic users about technology superiority, share drinks with workers in evening, occasionally venture into mines to check progress"
+  },
+  "testing_checklist": {
+    "dialogue_testing": false,
+    "quest_mechanics": false,
+    "faction_interactions": false,
+    "combat_behavior": false,
+    "economy_integration": false,
+    "story_consistency": false,
+    "manual_approval": false
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "character_id": "razorclaw_001",
+    "created_date": "2025-09-22T02:55:00Z",
+    "status": "ready_for_testing",
+    "last_updated": "2025-09-22T02:55:00Z",
+    "creator": "ai_storyteller_v1",
+    "testing_assigned_to": null
+  },
+  "character_data": {
+    "name": "Razorclaw",
+    "title": "Beast-kin Exile",
+    "race": "Wolf-kin (Beast-kin)",
+    "class": "Hunter/Tracker",
+    "level": 14,
+    "location": "forest_edge_camp",
+    "faction_allegiance": "Beast-kin Communities - Independent"
+  },
+  "story_integration": {
+    "lore_connection": "Razorclaw was an ordinary wolf when the Sundering's magical overflow granted him sentience. He's witnessed both the wonder and horror of sudden consciousness. Exiled from his pack for being 'unnatural' and rejected by human society for being 'animal', he helps other Beast-kin find their place in the world.",
+    "story_function": "Bridge between Beast-kin and human communities, provides unique perspective on post-Sundering changes, offers wilderness survival expertise",
+    "plot_hooks": [
+      "Mediating Beast-kin/human conflicts",
+      "Tracking dangerous creatures",
+      "Establishing Beast-kin trading posts",
+      "Investigating magical mutations in wildlife"
+    ],
+    "information_they_know": [
+      "Hidden Beast-kin settlements",
+      "Animal behavior and monster patterns",
+      "Which humans can be trusted with Beast-kin",
+      "Effects of wild magic on natural creatures"
+    ],
+    "conflicts_they_create": [
+      "His presence makes some humans uncomfortable",
+      "Torn between helping Beast-kin and gaining human acceptance",
+      "His predator instincts sometimes override social norms",
+      "Other Beast-kin see him as too accommodating to humans"
+    ]
+  },
+  "game_mechanics": {
+    "services_offered": [
+      "Wilderness tracking",
+      "Beast-kin faction introduction",
+      "Hunting training",
+      "Monster behavior consultation"
+    ],
+    "quests_available": [
+      {
+        "quest_id": "beastkin_quest_001",
+        "title": "Bridging Two Worlds",
+        "description": "Help establish a peaceful meeting between Beast-kin traders and Millbrook merchants",
+        "level_requirement": 9,
+        "rewards": ["Experience: 600", "Gold: 120", "Beast-kin Reputation: +75", "Unique Beast-kin Crafts"]
+      },
+      {
+        "quest_id": "beastkin_quest_002",
+        "title": "The Feral Hunt",
+        "description": "Track and stop a maddened Beast-kin who has lost their sentience to wild magic",
+        "level_requirement": 13,
+        "rewards": ["Experience: 1000", "Gold: 200", "Hunter's Instinct Skill"]
+      }
+    ],
+    "dialogue_trees": {
+      "greeting": "*Sniffs the air cautiously* Human-scent, but no fear-smell. Interesting. I am Razorclaw. Once wolf, now... something more. You don't run. That makes you different from most of your kind.",
+      "subsequent_meetings": "You return. Good. Trust is built on familiar scents and repeated meetings. The pack may be gone, but patterns of loyalty remain.",
+      "quest_related": "This task... it matters for both our peoples. Beast-kin need acceptance, humans need understanding. Perhaps together we can hunt a better future.",
+      "lore_sharing": "You cannot imagine the terror and wonder of sudden thought. One moment, simple hunter instincts. Next, questions. 'Why?' 'Who am I?' 'What am I?' Many Beast-kin go mad from it. I almost did."
+    }
+  },
+  "ai_behavior_config": {
+    "personality_traits": ["Cautious", "Loyal", "Instinctive", "Philosophical"],
+    "speech_patterns": "Mixes sophisticated observations with simple, primal descriptions. Uses hunting and pack metaphors. Sometimes uses scent to describe emotions",
+    "decision_making_style": "Instinct tempered by newfound reasoning, protective of the vulnerable, values pack loyalty",
+    "interaction_preferences": "More comfortable with actions than words, responds to honest and direct communication, distrustful of complex social games",
+    "auto_play_instructions": "Patrol forest edges, hunt for food, observe human settlements from afar, help lost travelers, mark territory boundaries, occasionally howl at night"
+  },
+  "testing_checklist": {
+    "dialogue_testing": false,
+    "quest_mechanics": false,
+    "faction_interactions": false,
+    "combat_behavior": false,
+    "economy_integration": false,
+    "story_consistency": false,
+    "manual_approval": false
+  }
+}

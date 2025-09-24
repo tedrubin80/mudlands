@@ -1,0 +1,46 @@
+{
+  "auto_player_settings": {
+    "max_concurrent_auto_players": 5,
+    "session_length_minutes": 120,
+    "activation_schedule": "02:00-06:00",
+    "behavior_randomization": true,
+    "interaction_cooldown_minutes": 10,
+    "enable_learning": true,
+    "log_interactions": true
+  },
+  "behavior_profiles": {
+    "explorer": {
+      "activities": ["explore_new_areas", "interact_with_npcs", "gather_resources"],
+      "interaction_style": "curious",
+      "risk_tolerance": "moderate"
+    },
+    "social": {
+      "activities": ["npc_conversations", "tavern_visits", "faction_interactions"],
+      "interaction_style": "friendly",
+      "risk_tolerance": "low"
+    },
+    "adventurer": {
+      "activities": ["quest_completion", "combat_training", "dungeon_exploration"],
+      "interaction_style": "bold",
+      "risk_tolerance": "high"
+    },
+    "merchant": {
+      "activities": ["trading", "crafting", "market_analysis"],
+      "interaction_style": "calculating",
+      "risk_tolerance": "low"
+    }
+  },
+  "character_rotation": [],
+  "testing_mode": {
+    "enabled": true,
+    "verbose_logging": true,
+    "error_recovery": "restart",
+    "max_errors_before_disable": 3
+  },
+  "integration_endpoints": {
+    "character_loader": "/api/characters/load-from-ai",
+    "status_updater": "/api/characters/:id/status",
+    "auto_enabler": "/api/characters/:id/enable-auto",
+    "activity_logger": "/api/characters/:id/log-activity"
+  }
+}

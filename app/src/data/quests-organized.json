@@ -1,0 +1,429 @@
+{
+  "quest_categories": {
+    "beginner": {
+      "level_range": [1, 3],
+      "description": "Starting quests for new adventurers",
+      "quests": [
+        {
+          "id": "welcome_to_elden",
+          "title": "Welcome to Elden",
+          "description": "Learn the basics of survival in this new world.",
+          "type": "tutorial",
+          "category": "main",
+          "difficulty": "easy",
+          "level_requirement": 1,
+          "narrative": {
+            "hook": "Welcome to Elden, brave adventurer! I'm Marcus, town guard. Let me show you the basics.",
+            "background": "Every successful adventurer starts by understanding their surroundings.",
+            "stakes": "Knowledge of the town could mean the difference between life and death.",
+            "resolution": "Well done! You're ready to take on greater challenges!"
+          },
+          "giver": "guard_marcus",
+          "objectives": [
+            {
+              "id": "explore_market",
+              "type": "explore",
+              "description": "Visit the Market District",
+              "target": "market_district",
+              "quantity": 1
+            },
+            {
+              "id": "talk_to_innkeeper",
+              "type": "talk_to",
+              "description": "Speak with Sarah at the Inn",
+              "target": "innkeeper_sarah",
+              "quantity": 1
+            },
+            {
+              "id": "visit_training",
+              "type": "explore",
+              "description": "Check out the Training Grounds",
+              "target": "training_grounds",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 100,
+            "gold": 50,
+            "items": [{ "id": "health_potion", "quantity": 3 }]
+          }
+        },
+        {
+          "id": "first_combat",
+          "title": "Your First Battle",
+          "description": "Learn combat basics by defeating training dummies and weak creatures.",
+          "type": "tutorial",
+          "category": "main", 
+          "difficulty": "easy",
+          "level_requirement": 1,
+          "prerequisites": { "quests_completed": ["welcome_to_elden"] },
+          "narrative": {
+            "hook": "Time to learn how to defend yourself! Combat skills are essential for any adventurer.",
+            "background": "The world is dangerous, and you'll need to know how to fight to survive.",
+            "stakes": "Without combat skills, you won't last long outside the town walls.",
+            "resolution": "Excellent! You've learned the basics of combat. Now you can face real dangers."
+          },
+          "giver": "trainer_gareth",
+          "objectives": [
+            {
+              "id": "practice_combat",
+              "type": "kill",
+              "description": "Defeat 3 Training Dummies",
+              "target": "training_dummy",
+              "quantity": 3
+            },
+            {
+              "id": "first_real_fight",
+              "type": "kill",
+              "description": "Defeat 2 Giant Rats",
+              "target": "giant_rat",
+              "quantity": 2
+            }
+          ],
+          "rewards": {
+            "experience": 150,
+            "gold": 30,
+            "items": [{ "id": "wooden_sword", "quantity": 1 }]
+          }
+        },
+        {
+          "id": "herb_collection_basics",
+          "title": "Gathering Basics",
+          "description": "Learn to collect resources by gathering herbs for the innkeeper.",
+          "type": "fetch",
+          "category": "side",
+          "difficulty": "easy",
+          "level_requirement": 1,
+          "narrative": {
+            "hook": "I need some healing herbs, and you need to learn how to gather resources.",
+            "background": "Knowing how to find and collect useful items is a vital survival skill.",
+            "stakes": "Resource gathering can provide income and essential supplies.",
+            "resolution": "Perfect! You understand the basics of resource collection now."
+          },
+          "giver": "innkeeper_sarah",
+          "objectives": [
+            {
+              "id": "collect_herbs",
+              "type": "collect",
+              "description": "Collect 5 Healing Herbs",
+              "target": "healing_herb",
+              "quantity": 5
+            }
+          ],
+          "rewards": {
+            "experience": 75,
+            "gold": 25,
+            "items": [{ "id": "gathering_pouch", "quantity": 1 }]
+          }
+        }
+      ]
+    },
+
+    "novice": {
+      "level_range": [3, 6],
+      "description": "Quests for developing adventurers",
+      "quests": [
+        {
+          "id": "the_missing_merchant",
+          "title": "The Missing Merchant",
+          "description": "A merchant has gone missing on the forest road. Investigate their disappearance.",
+          "type": "mystery",
+          "category": "main",
+          "difficulty": "medium",
+          "level_requirement": 3,
+          "prerequisites": {
+            "level": 3,
+            "quests_completed": ["welcome_to_elden", "first_combat"]
+          },
+          "narrative": {
+            "hook": "My trading partner should have been here days ago. Something terrible must have happened.",
+            "background": "The forest paths have been dangerous lately, with reports of bandits.",
+            "stakes": "If we can't secure the trade routes, Elden's economy will suffer.",
+            "resolution": "Thank you! The roads are safer now, and we can resume trade."
+          },
+          "giver": "merchant_elena",
+          "objectives": [
+            {
+              "id": "investigate_road",
+              "type": "explore",
+              "description": "Search the forest road for clues",
+              "target": "forest_entrance", 
+              "quantity": 1
+            },
+            {
+              "id": "clear_goblins",
+              "type": "kill",
+              "description": "Defeat the Goblin Bandits",
+              "target": "goblin",
+              "quantity": 5
+            },
+            {
+              "id": "find_merchant",
+              "type": "collect",
+              "description": "Find evidence of the merchant's fate",
+              "target": "merchant_ledger",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 300,
+            "gold": 150,
+            "items": [{ "id": "leather_armor", "quantity": 1 }]
+          }
+        },
+        {
+          "id": "wolf_pack_menace",
+          "title": "Wolf Pack Menace", 
+          "description": "A large wolf pack is threatening travelers on the northern road.",
+          "type": "kill",
+          "category": "side",
+          "difficulty": "medium",
+          "level_requirement": 4,
+          "narrative": {
+            "hook": "A massive wolf pack has claimed the northern road. Travelers are too frightened to pass.",
+            "background": "These wolves are unusually aggressive - something has made them desperate.",
+            "stakes": "Trade with northern settlements will cease if the road remains blocked.",
+            "resolution": "The road is clear! Travelers can once again pass safely to the north."
+          },
+          "giver": "guard_marcus",
+          "objectives": [
+            {
+              "id": "defeat_wolves",
+              "type": "kill",
+              "description": "Defeat Northern Wolves",
+              "target": "wolf",
+              "quantity": 6
+            },
+            {
+              "id": "defeat_alpha",
+              "type": "kill",
+              "description": "Defeat the Alpha Wolf",
+              "target": "dire_wolf",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 400,
+            "gold": 100,
+            "items": [{ "id": "wolf_hide_cloak", "quantity": 1 }]
+          }
+        }
+      ]
+    },
+
+    "intermediate": {
+      "level_range": [6, 10],
+      "description": "Challenging quests for experienced adventurers",
+      "quests": [
+        {
+          "id": "ancient_magic_awakening",
+          "title": "Ancient Magic Awakening", 
+          "description": "Strange magical energies are disrupting the land.",
+          "type": "mystery",
+          "category": "main",
+          "difficulty": "hard",
+          "level_requirement": 6,
+          "prerequisites": {
+            "level": 6,
+            "quests_completed": ["the_missing_merchant"]
+          },
+          "narrative": {
+            "hook": "The magical energies I've been sensing grow stronger each day.",
+            "background": "Ancient mages built ruins to contain dangerous magical forces.",
+            "stakes": "If the ancient seals fail, magical chaos could consume the region.",
+            "resolution": "Your bravery has prevented a magical catastrophe!"
+          },
+          "giver": "mage_aldric",
+          "objectives": [
+            {
+              "id": "gather_components",
+              "type": "collect", 
+              "description": "Gather 3 Mana Crystals from magical creatures",
+              "target": "mana_crystal",
+              "quantity": 3
+            },
+            {
+              "id": "explore_ruins",
+              "type": "explore",
+              "description": "Investigate the Ancient Ruins",
+              "target": "ancient_ruins",
+              "quantity": 1
+            },
+            {
+              "id": "defeat_guardian",
+              "type": "kill",
+              "description": "Defeat the Stone Guardian",
+              "target": "stone_golem",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 750,
+            "gold": 300,
+            "items": [{ "id": "mage_staff", "quantity": 1 }]
+          }
+        },
+        {
+          "id": "blacksmith_mastery",
+          "title": "The Blacksmith's Challenge",
+          "description": "Help Thorin create a masterwork weapon.",
+          "type": "fetch",
+          "category": "side",
+          "difficulty": "hard",
+          "level_requirement": 7,
+          "narrative": {
+            "hook": "I've got a commission for a masterwork blade. Think ye can handle the challenge?",
+            "background": "This blade requires the finest materials and skilled craftsmanship.",
+            "stakes": "This commission could establish my reputation throughout the kingdom.",
+            "resolution": "Magnificent! This is the finest blade I've ever forged!"
+          },
+          "giver": "blacksmith_thorin",
+          "objectives": [
+            {
+              "id": "gather_star_metal",
+              "type": "collect",
+              "description": "Find Star Metal Ore in the deep mines",
+              "target": "star_metal_ore",
+              "quantity": 3
+            },
+            {
+              "id": "defeat_mine_boss",
+              "type": "kill",
+              "description": "Defeat the Mine Guardian",
+              "target": "iron_guardian",
+              "quantity": 1
+            },
+            {
+              "id": "forge_weapon",
+              "type": "deliver",
+              "description": "Help forge the masterwork blade",
+              "target": "blacksmith_thorin",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 600,
+            "gold": 250,
+            "items": [{ "id": "masterwork_sword", "quantity": 1 }]
+          }
+        }
+      ]
+    },
+
+    "advanced": {
+      "level_range": [10, 15],
+      "description": "Epic quests for veteran adventurers",
+      "quests": [
+        {
+          "id": "shadow_invasion",
+          "title": "The Shadow Invasion",
+          "description": "Dark creatures emerge from the depths. Unite the town's defenders.",
+          "type": "epic",
+          "category": "main",
+          "difficulty": "epic",
+          "level_requirement": 10,
+          "prerequisites": {
+            "level": 10,
+            "quests_completed": ["ancient_magic_awakening"]
+          },
+          "narrative": {
+            "hook": "Dark creatures pour from the caverns beneath. All of Elden is in danger!",
+            "background": "The disturbed magical energies have awakened something ancient and evil.",
+            "stakes": "If we cannot stop this invasion, Elden will fall to darkness.",
+            "resolution": "The shadow threat is ended! You are truly a hero of the realm!"
+          },
+          "giver": "guard_marcus",
+          "objectives": [
+            {
+              "id": "rally_defenders",
+              "type": "talk_to",
+              "description": "Rally the town's key defenders",
+              "target": "town_leaders",
+              "quantity": 5
+            },
+            {
+              "id": "clear_caverns",
+              "type": "kill",
+              "description": "Defeat Shadow Spawn in the caverns",
+              "target": "shadow_spawn",
+              "quantity": 10
+            },
+            {
+              "id": "banish_shadow_lord",
+              "type": "kill",
+              "description": "Banish the Shadow Lord",
+              "target": "shadow_lord",
+              "quantity": 1
+            }
+          ],
+          "rewards": {
+            "experience": 1500,
+            "gold": 500,
+            "items": [
+              { "id": "hero_blade", "quantity": 1 },
+              { "id": "champion_armor", "quantity": 1 }
+            ],
+            "titles": ["Hero of Elden"]
+          }
+        }
+      ]
+    },
+
+    "daily_repeatable": {
+      "level_range": [1, 99],
+      "description": "Daily quests for ongoing progression",
+      "quests": [
+        {
+          "id": "daily_herb_gathering",
+          "title": "Daily Herb Collection",
+          "description": "Collect healing herbs for the town's medical supplies.",
+          "type": "fetch",
+          "category": "daily",
+          "difficulty": "easy",
+          "level_requirement": 1,
+          "repeatable": true,
+          "cooldown": 86400000,
+          "objectives": [
+            {
+              "id": "collect_daily_herbs",
+              "type": "collect",
+              "description": "Collect 8 Healing Herbs",
+              "target": "healing_herb",
+              "quantity": 8
+            }
+          ],
+          "rewards": {
+            "experience": 100,
+            "gold": 50,
+            "items": [{ "id": "health_potion", "quantity": 2 }]
+          }
+        },
+        {
+          "id": "daily_monster_hunt",
+          "title": "Daily Monster Hunt",
+          "description": "Clear dangerous creatures from around the town.",
+          "type": "kill",
+          "category": "daily",
+          "difficulty": "medium",
+          "level_requirement": 3,
+          "repeatable": true,
+          "cooldown": 86400000,
+          "objectives": [
+            {
+              "id": "hunt_monsters",
+              "type": "kill",
+              "description": "Defeat any 5 monsters",
+              "target": "any_monster",
+              "quantity": 5
+            }
+          ],
+          "rewards": {
+            "experience": 200,
+            "gold": 75,
+            "items": [{ "id": "combat_supplies", "quantity": 1 }]
+          }
+        }
+      ]
+    }
+  }
+}

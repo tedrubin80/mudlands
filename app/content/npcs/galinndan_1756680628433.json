@@ -1,0 +1,89 @@
+{
+  "id": "4266663d-b45e-44ce-93f7-dc6d3e3f9114",
+  "name": "Galinndan",
+  "title": "",
+  "race": "elf",
+  "gender": "male",
+  "age": "adult",
+  "appearance": {
+    "height": "short",
+    "build": "tall and graceful",
+    "hair": "auburn hair",
+    "eyes": "silver eyes",
+    "clothing": "worn traveler's garb",
+    "distinguishing": []
+  },
+  "personality": {
+    "values": [
+      "peace",
+      "creativity"
+    ],
+    "objectives": [
+      "uncover truth",
+      "master a skill"
+    ],
+    "identity": "common citizen",
+    "conflicts": [
+      "fear",
+      "internal struggle"
+    ],
+    "emotions": [
+      "frustrated"
+    ]
+  },
+  "speech": {
+    "greeting": "Oh... hello there. Is everything alright?",
+    "farewell": "Safe travels, friend.",
+    "patterns": [
+      "tends to ramble",
+      "uses outdated expressions"
+    ],
+    "vocabulary": "common",
+    "accent": "local"
+  },
+  "knowledge": {
+    "topics": [
+      "local trade",
+      "item values",
+      "market conditions",
+      "travel routes",
+      "general conversation"
+    ],
+    "secrets": [],
+    "rumors": [
+      "strange lights seen in the mountains",
+      "increased monster activity reported"
+    ],
+    "specialties": [
+      "local trade"
+    ]
+  },
+  "relationships": {
+    "family": {},
+    "friends": [],
+    "enemies": [],
+    "romantic": null,
+    "professional": []
+  },
+  "quests": {
+    "gives": [],
+    "involved_in": [],
+    "completed_for_player": []
+  },
+  "stats": null,
+  "skills": [],
+  "equipment": [],
+  "location": "town_square",
+  "schedule": {
+    "default": "stays_put"
+  },
+  "movement_pattern": "stationary",
+  "mood": "neutral",
+  "trust_level": 0,
+  "reputation_modifiers": {},
+  "story_flags": {},
+  "created_by": "system",
+  "creation_date": 1756680628430,
+  "last_interaction": null,
+  "interaction_count": 0
+}
