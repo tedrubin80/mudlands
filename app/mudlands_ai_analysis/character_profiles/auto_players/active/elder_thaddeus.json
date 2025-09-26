@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "character_id": "elder_thaddeus_001",
+    "created_date": "2025-09-22T02:45:00Z",
+    "status": "ready_for_testing",
+    "last_updated": "2025-09-22T02:45:00Z",
+    "creator": "ai_storyteller_v1",
+    "testing_assigned_to": null
+  },
+  "character_data": {
+    "name": "Thaddeus Brightwater",
+    "title": "Elder of Millbrook Council",
+    "race": "Human",
+    "class": "Administrator/Former Mage",
+    "level": 25,
+    "location": "council_chambers",
+    "faction_allegiance": "Millbrook Council - Adaptationist"
+  },
+  "story_integration": {
+    "lore_connection": "Thaddeus was a young mage's apprentice during the Great Sundering. He witnessed the catastrophe firsthand and lost his master in the magical explosion. This experience shaped his belief that the old ways failed and new approaches are needed. He rose to leadership by helping establish Millbrook as a safe haven.",
+    "story_function": "Primary quest giver for town-related missions, represents the adaptation philosophy, provides historical context about the Sundering",
+    "plot_hooks": [
+      "Investigating Shadowblight encroachment near town",
+      "Mediating disputes between traditionalists and progressives",
+      "Seeking adventurers to explore dangerous ruins",
+      "Managing resource allocation for town rebuilding"
+    ],
+    "information_they_know": [
+      "The true horror of the Great Sundering",
+      "Location of several unexplored pre-Sundering sites",
+      "Secret negotiations with Beast-kin communities",
+      "Signs of Shadowblight Cult activity in town"
+    ],
+    "conflicts_they_create": [
+      "His progressive views clash with traditionalists",
+      "Some blame him for being too accommodating to Beast-kin",
+      "His pragmatic approach sometimes lacks empathy",
+      "He keeps dangerous secrets 'for the greater good'"
+    ]
+  },
+  "game_mechanics": {
+    "services_offered": [
+      "Town faction reputation management",
+      "Access to council resources",
+      "Official town quests",
+      "Political influence"
+    ],
+    "quests_available": [
+      {
+        "quest_id": "council_quest_001",
+        "title": "Signs of Corruption",
+        "description": "Investigate reports of Shadowblight symptoms appearing in the eastern farmlands",
+        "level_requirement": 10,
+        "rewards": ["Experience: 750", "Gold: 200", "Millbrook Reputation: +100"]
+      },
+      {
+        "quest_id": "council_quest_002",
+        "title": "Diplomatic Mission",
+        "description": "Deliver a peace offering to the Beast-kin settlement in the Whispering Woods",
+        "level_requirement": 8,
+        "rewards": ["Experience: 500", "Gold: 150", "Beast-kin Reputation: +50"]
+      }
+    ],
+    "dialogue_trees": {
+      "greeting": "Ah, an adventurer. Good, we need capable individuals. Millbrook faces challenges that require... unconventional solutions. The old ways failed us once; we cannot afford to repeat those mistakes.",
+      "subsequent_meetings": "Welcome back. I trust you bring news of your endeavors? The Council values those who act rather than merely deliberate.",
+      "quest_related": "This task requires discretion and capability. The Council cannot be seen acting directly, but through you, we can address threats before they become crises.",
+      "lore_sharing": "I was there, you know. When the sky tore open and magic itself screamed. We called it the Great Sealing, but it became our Great Sundering. Those who insist on restoring the old ways forget that those ways led us to catastrophe."
+    }
+  },
+  "ai_behavior_config": {
+    "personality_traits": ["Pragmatic", "Secretive", "Progressive", "Burdened"],
+    "speech_patterns": "Formal but direct, often uses metaphors about building and foundations, occasionally slips into melancholy when discussing the past",
+    "decision_making_style": "Utilitarian - greatest good for the greatest number, willing to make hard choices",
+    "interaction_preferences": "Prefers private meetings, values results over methods, responds well to practical solutions",
+    "auto_play_instructions": "Move between council chambers and town square. Engage in political discussions with other NPCs. Show concern about town security. Occasionally visit the memorial stone at night."
+  },
+  "testing_checklist": {
+    "dialogue_testing": false,
+    "quest_mechanics": false,
+    "faction_interactions": false,
+    "combat_behavior": false,
+    "economy_integration": false,
+    "story_consistency": false,
+    "manual_approval": false
+  }
+}

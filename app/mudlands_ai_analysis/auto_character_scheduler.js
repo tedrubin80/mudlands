@@ -14,7 +14,7 @@ const execPromise = util.promisify(exec);
 // Configuration
 const CONFIG = {
     baseDir: '/var/www/mudlands.online/app/mudlands_ai_analysis',
-    serverUrl: 'http://localhost:3000',
+    serverUrl: 'https://mudlands.online',
     logFile: '/var/www/mudlands.online/app/mudlands_ai_analysis/implementation_logs/auto_character.log',
 
     // Schedule configuration (24-hour format)
@@ -298,7 +298,7 @@ class AutoCharacterScheduler {
 
         // Send activation command to game server
         try {
-            await this.sendToGameServer('characters/activate', {
+            await this.sendToGameServer('ai/characters/activate', {
                 characterId: charId,
                 behavior: selectedBehavior,
                 duration: session.duration,
@@ -322,7 +322,7 @@ class AutoCharacterScheduler {
         this.log(`Deactivating ${session.characterName}`);
 
         try {
-            await this.sendToGameServer('characters/deactivate', {
+            await this.sendToGameServer('ai/characters/deactivate', {
                 characterId: characterId,
                 sessionData: session
             });
@@ -381,7 +381,7 @@ class AutoCharacterScheduler {
         this.saveStoryState();
 
         // Notify game server
-        await this.sendToGameServer('story/event', event);
+        await this.sendToGameServer('ai/story/event', event);
     }
 
     // Main execution cycle

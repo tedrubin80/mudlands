@@ -4,6 +4,7 @@ const World = require('./World');
 const CombatSystem = require('./CombatSystem');
 const QuestManager = require('./QuestManager');
 const CraftingSystem = require('../systems/CraftingSystem');
+const AICharacterController = require('./AICharacterController');
 const GameLogger = require('../utils/logger');
 
 class GameEngine extends EventEmitter {
@@ -17,6 +18,9 @@ class GameEngine extends EventEmitter {
         this.tickRate = process.env.TICK_RATE || 100;
         this.saveInterval = process.env.SAVE_INTERVAL || 60000;
         this.running = false;
+
+        // Initialize AI Character Controller
+        this.aiCharacterController = null; // Will be initialized after socket handler is ready
     }
 
     async initialize() {
@@ -256,10 +260,21 @@ class GameEngine extends EventEmitter {
         }
     }
 
+    initializeAICharacterController(socketHandler) {
+        if (!this.aiCharacterController && socketHandler) {
+            this.aiCharacterController = new AICharacterController(this.world, socketHandler);
+            GameLogger.info('AI Character Controller initialized');
+        }
+    }
+
     shutdown() {
         GameLogger.gameEvent('engine_shutdown_start');
         this.running = false;
         this.saveAllPlayers();
+        if (this.aiCharacterController) {
+            // AI Character Controller doesn't have a shutdown method, but we should clear active characters
+            this.aiCharacterController = null;
+        }
         GameLogger.gameEvent('engine_shutdown_complete');
     }
 }
