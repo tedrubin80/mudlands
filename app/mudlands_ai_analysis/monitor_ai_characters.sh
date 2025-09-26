@@ -20,8 +20,8 @@ notify_server() {
     local data=$2
 
     # Check if server is running
-    if curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health | grep -q "200"; then
-        curl -X POST "http://localhost:3000/api/$endpoint" \
+    if curl -s -o /dev/null -w "%{http_code}" https://mudlands.online/health | grep -q "200"; then
+        curl -X POST "https://mudlands.online/api/$endpoint" \
              -H "Content-Type: application/json" \
              -d "$data" \
              2>/dev/null

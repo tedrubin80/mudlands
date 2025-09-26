@@ -57,6 +57,8 @@ class CommandParser {
             equip: this.handleEquip.bind(this),
             unequip: this.handleUnequip.bind(this),
             remove: this.handleUnequip.bind(this),
+            compare: this.handleCompare.bind(this),
+            comp: this.handleCompare.bind(this),
             // Shop commands
             buy: this.handleBuy.bind(this),
             sell: this.handleSell.bind(this),
@@ -440,14 +442,35 @@ class CommandParser {
     }
 
     handleInventory(player) {
-        if (!player.inventory || player.inventory.length === 0) {
-            return { success: true, message: 'Your inventory is empty.' };
-        }
+        const maxCapacity = player.inventoryCapacity || 20; // Default capacity is 20 items
+        const currentItems = player.inventory ? player.inventory.length : 0;
+        const weightCarried = player.inventory ? player.inventory.reduce((total, item) => {
+            return total + ((item.weight || 1) * (item.quantity || 1));
+        }, 0) : 0;
+        const maxWeight = player.maxWeight || 100 + (player.stats?.str || 10) * 5; // Base 100 + STR bonus
 
         let output = [chalk.cyan.bold('=== Inventory ===')];
-        player.inventory.forEach((item, index) => {
-            output.push(chalk.white(`${index + 1}. ${item.name} ${item.quantity > 1 ? `(${item.quantity})` : ''}`));
-        });
+        output.push(chalk.gray(`Capacity: ${currentItems}/${maxCapacity} items | Weight: ${weightCarried}/${maxWeight} lbs`));
+
+        if (!player.inventory || player.inventory.length === 0) {
+            output.push(chalk.gray('Your inventory is empty.'));
+        } else {
+            output.push(''); // Empty line for spacing
+            player.inventory.forEach((item, index) => {
+                const weightStr = item.weight ? ` (${item.weight} lbs)` : '';
+                const quantityStr = item.quantity > 1 ? ` x${item.quantity}` : '';
+                output.push(chalk.white(`${index + 1}. ${item.name}${quantityStr}${weightStr}`));
+            });
+        }
+
+        // Show if overloaded
+        if (weightCarried > maxWeight) {
+            output.push('');
+            output.push(chalk.red.bold('⚠️  You are overloaded and move slowly!'));
+        } else if (weightCarried > maxWeight * 0.9) {
+            output.push('');
+            output.push(chalk.yellow('⚠️  You are nearly at max carrying capacity.'));
+        }
 
         return { success: true, message: output.join('\n') };
     }
@@ -1400,7 +1423,7 @@ class CommandParser {
 
         const slotName = slot.toLowerCase();
         const validSlots = ['weapon', 'armor', 'helmet', 'boots', 'accessory'];
-        
+
         if (!validSlots.includes(slotName)) {
             return { success: false, message: 'Invalid equipment slot.' };
         }
@@ -1411,15 +1434,126 @@ class CommandParser {
 
         const item = player.equipment[slotName];
         const success = player.unequipItem(slotName);
-        
+
         if (success) {
-            return { 
-                success: true, 
+            return {
+                success: true,
                 message: chalk.yellow(`You unequip ${item.name}.`)
             };
         } else {
             return { success: false, message: `Failed to unequip ${item.name}.` };
         }
+    }
+
+    handleCompare(player, target) {
+        if (!target) {
+            return { success: false, message: 'Compare what item?' };
+        }
+
+        // Find item in inventory
+        const item = player.inventory.find(i =>
+            i.name.toLowerCase().includes(target.toLowerCase()) ||
+            i.id.toLowerCase() === target.toLowerCase()
+        );
+
+        if (!item) {
+            return { success: false, message: `You don't have '${target}' in your inventory.` };
+        }
+
+        // Check if item is equippable
+        if (!item.slot) {
+            return { success: false, message: `${item.name} cannot be equipped.` };
+        }
+
+        // Get currently equipped item in the same slot
+        const equippedItem = player.equipment[item.slot];
+
+        let output = [chalk.cyan.bold(`=== Comparing ${item.name} ===`)];
+
+        // Format item stats
+        const formatItemStats = (itm) => {
+            let stats = [];
+            if (itm.damage) stats.push(`Damage: ${itm.damage}`);
+            if (itm.defense) stats.push(`Defense: ${itm.defense}`);
+            if (itm.bonuses) {
+                for (const [stat, value] of Object.entries(itm.bonuses)) {
+                    stats.push(`${stat.toUpperCase()}: ${value > 0 ? '+' : ''}${value}`);
+                }
+            }
+            if (itm.effects) {
+                stats.push(`Effects: ${itm.effects.join(', ')}`);
+            }
+            if (itm.requirements) {
+                let reqs = [];
+                for (const [stat, value] of Object.entries(itm.requirements)) {
+                    reqs.push(`${stat}: ${value}`);
+                }
+                stats.push(`Requirements: ${reqs.join(', ')}`);
+            }
+            return stats;
+        };
+
+        // Show inventory item stats
+        output.push(chalk.green(`\n[Inventory] ${item.name}:`));
+        const itemStats = formatItemStats(item);
+        if (itemStats.length > 0) {
+            itemStats.forEach(stat => output.push(`  ${stat}`));
+        } else {
+            output.push('  No special properties');
+        }
+
+        // Show equipped item stats or "Nothing equipped"
+        if (equippedItem) {
+            output.push(chalk.yellow(`\n[Equipped] ${equippedItem.name}:`));
+            const equippedStats = formatItemStats(equippedItem);
+            if (equippedStats.length > 0) {
+                equippedStats.forEach(stat => output.push(`  ${stat}`));
+            } else {
+                output.push('  No special properties');
+            }
+
+            // Show comparison
+            output.push(chalk.white('\n--- Comparison ---'));
+
+            // Compare damage
+            if (item.damage || equippedItem.damage) {
+                const itemDmg = item.damage || 0;
+                const equippedDmg = equippedItem.damage || 0;
+                const diff = itemDmg - equippedDmg;
+                const color = diff > 0 ? chalk.green : diff < 0 ? chalk.red : chalk.gray;
+                output.push(color(`Damage: ${diff > 0 ? '+' : ''}${diff}`));
+            }
+
+            // Compare defense
+            if (item.defense || equippedItem.defense) {
+                const itemDef = item.defense || 0;
+                const equippedDef = equippedItem.defense || 0;
+                const diff = itemDef - equippedDef;
+                const color = diff > 0 ? chalk.green : diff < 0 ? chalk.red : chalk.gray;
+                output.push(color(`Defense: ${diff > 0 ? '+' : ''}${diff}`));
+            }
+
+            // Compare bonuses
+            const allBonusStats = new Set([
+                ...Object.keys(item.bonuses || {}),
+                ...Object.keys(equippedItem.bonuses || {})
+            ]);
+
+            for (const stat of allBonusStats) {
+                const itemBonus = (item.bonuses && item.bonuses[stat]) || 0;
+                const equippedBonus = (equippedItem.bonuses && equippedItem.bonuses[stat]) || 0;
+                const diff = itemBonus - equippedBonus;
+                if (diff !== 0) {
+                    const color = diff > 0 ? chalk.green : chalk.red;
+                    output.push(color(`${stat.toUpperCase()}: ${diff > 0 ? '+' : ''}${diff}`));
+                }
+            }
+        } else {
+            output.push(chalk.gray(`\n[Equipped] Nothing equipped in ${item.slot} slot`));
+            output.push(chalk.green('\nEquipping this item would provide all its benefits!'));
+        }
+
+        return { success: true, message: output.join('\n') };
     }
 
     handleInspect(player, target) {

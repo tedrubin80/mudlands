@@ -309,4 +309,238 @@ router.get('/config', (req, res) => {
     });
 });
 
+// AI Character Activation Endpoints (for the auto-character scheduler)
+
+// Activate AI Character
+router.post('/characters/activate', async (req, res) => {
+    try {
+        const { characterId, behavior, duration, event } = req.body;
+
+        if (!characterId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Character ID is required'
+            });
+        }
+
+        GameLogger.info('AI Character activation request', {
+            characterId,
+            behavior,
+            duration,
+            hasEvent: !!event
+        });
+
+        // Get game engine instance if available
+        const gameEngine = req.app.get('gameEngine'); // We'll need to set this in server.js
+
+        if (gameEngine && gameEngine.aiCharacterController) {
+            // Use the existing AI Character Controller
+            const success = await gameEngine.aiCharacterController.activateCharacter(
+                characterId,
+                behavior,
+                duration,
+                event
+            );
+
+            if (success) {
+                res.json({
+                    success: true,
+                    message: `Character ${characterId} activated with behavior: ${behavior}`,
+                    characterId,
+                    behavior,
+                    duration,
+                    activatedAt: new Date().toISOString()
+                });
+            } else {
+                res.status(404).json({
+                    success: false,
+                    message: `Character ${characterId} not found or activation failed`
+                });
+            }
+        } else {
+            // Fallback: Log the activation but don't actually activate
+            GameLogger.warn('AI Character Controller not available, logging activation only', {
+                characterId,
+                behavior
+            });
+
+            res.json({
+                success: true,
+                message: `Character activation logged (controller not available): ${characterId}`,
+                characterId,
+                behavior,
+                duration,
+                activatedAt: new Date().toISOString(),
+                warning: 'AI Character Controller not initialized'
+            });
+        }
+
+    } catch (error) {
+        GameLogger.error('AI Character activation failed', {
+            error: error.message,
+            characterId: req.body.characterId
+        });
+        res.status(500).json({
+            success: false,
+            message: 'Character activation failed',
+            error: error.message
+        });
+    }
+});
+
+// Deactivate AI Character
+router.post('/characters/deactivate', async (req, res) => {
+    try {
+        const { characterId, sessionData } = req.body;
+
+        if (!characterId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Character ID is required'
+            });
+        }
+
+        GameLogger.info('AI Character deactivation request', {
+            characterId,
+            sessionDuration: sessionData?.duration
+        });
+
+        // Get game engine instance if available
+        const gameEngine = req.app.get('gameEngine');
+
+        if (gameEngine && gameEngine.aiCharacterController) {
+            // Use the existing AI Character Controller
+            await gameEngine.aiCharacterController.deactivateCharacter(characterId);
+
+            res.json({
+                success: true,
+                message: `Character ${characterId} deactivated`,
+                characterId,
+                deactivatedAt: new Date().toISOString(),
+                sessionData
+            });
+        } else {
+            // Fallback: Log the deactivation
+            GameLogger.warn('AI Character Controller not available, logging deactivation only', {
+                characterId
+            });
+
+            res.json({
+                success: true,
+                message: `Character deactivation logged (controller not available): ${characterId}`,
+                characterId,
+                deactivatedAt: new Date().toISOString(),
+                warning: 'AI Character Controller not initialized'
+            });
+        }
+
+    } catch (error) {
+        GameLogger.error('AI Character deactivation failed', {
+            error: error.message,
+            characterId: req.body.characterId
+        });
+        res.status(500).json({
+            success: false,
+            message: 'Character deactivation failed',
+            error: error.message
+        });
+    }
+});
+
+// Story Event Processing
+router.post('/story/event', async (req, res) => {
+    try {
+        const event = req.body;
+
+        GameLogger.info('Story event received', {
+            type: event.type,
+            description: event.description,
+            impact: event.impact,
+            participants: event.participants
+        });
+
+        // Get game engine instance if available
+        const gameEngine = req.app.get('gameEngine');
+
+        if (gameEngine && gameEngine.aiCharacterController) {
+            // Process the story event through the AI Character Controller
+            await gameEngine.aiCharacterController.handleStoryEvent(event);
+
+            res.json({
+                success: true,
+                message: 'Story event processed',
+                event: {
+                    type: event.type,
+                    description: event.description,
+                    processedAt: new Date().toISOString()
+                }
+            });
+        } else {
+            // Fallback: Log the event
+            GameLogger.warn('AI Character Controller not available, logging story event only', event);
+
+            res.json({
+                success: true,
+                message: 'Story event logged (controller not available)',
+                event: {
+                    ...event,
+                    processedAt: new Date().toISOString()
+                },
+                warning: 'AI Character Controller not initialized'
+            });
+        }
+
+    } catch (error) {
+        GameLogger.error('Story event processing failed', {
+            error: error.message,
+            event: req.body
+        });
+        res.status(500).json({
+            success: false,
+            message: 'Story event processing failed',
+            error: error.message
+        });
+    }
+});
+
+// Get AI Character Status
+router.get('/characters/status', async (req, res) => {
+    try {
+        const gameEngine = req.app.get('gameEngine');
+
+        if (gameEngine && gameEngine.aiCharacterController) {
+            const report = gameEngine.aiCharacterController.getStatusReport();
+
+            res.json({
+                success: true,
+                report,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            res.json({
+                success: true,
+                report: {
+                    activeCharacters: [],
+                    totalStats: {
+                        activations: 0,
+                        interactions: 0,
+                        questsGiven: 0,
+                        storiesShared: 0
+                    }
+                },
+                timestamp: new Date().toISOString(),
+                warning: 'AI Character Controller not initialized'
+            });
+        }
+
+    } catch (error) {
+        GameLogger.error('AI Character status failed', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get character status',
+            error: error.message
+        });
+    }
+});
+
 module.exports = router;

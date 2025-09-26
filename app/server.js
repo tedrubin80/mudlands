@@ -78,6 +78,9 @@ const apiLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.ip || req.connection.remoteAddress;
+    }
 });
 
 const authLimiter = rateLimit({
@@ -86,6 +89,9 @@ const authLimiter = rateLimit({
     message: 'Too many login attempts from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.ip || req.connection.remoteAddress;
+    }
 });
 
 app.use(express.json({ limit: '10mb' }));
@@ -126,16 +132,21 @@ const gameEngine = new GameEngine();
 const commandParser = new CommandParser(gameEngine);
 const socketHandler = new SocketHandler(io, gameEngine, commandParser);
 
+// Initialize AI Character Controller after socket handler is ready
+gameEngine.initializeAICharacterController(socketHandler);
+
 // Admin routes BEFORE CSRF protection
 const createAdminRouter = require('./src/routes/admin');
 const adminRoutes = createAdminRouter(gameEngine);
 const authRoutes = require('./src/routes/auth');
+const characterRoutes = require('./src/routes/character');
 app.use('/api/admin', adminRoutes);
 
-// Auth routes BEFORE CSRF protection (they have rate limiting instead)
+// Auth and character routes BEFORE CSRF protection (they have rate limiting instead)
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/character', authLimiter, characterRoutes);
 
-// Apply CSRF protection to other API routes (after admin and auth routes)
+// Apply CSRF protection to other API routes (after admin, auth, and character routes)
 app.use('/api', CSRFProtection.verifyToken);
 
 app.get('/', (req, res) => {
@@ -162,11 +173,13 @@ app.get('/health', (req, res) => {
     });
 });
 
-const characterRoutes = require('./src/routes/character');
 const aiRoutes = require('./src/routes/ai');
 const roleManagementRoutes = require('./src/routes/roleManagement');
 const ErrorHandler = require('./src/middleware/errorHandler');
-app.use('/api/character', authLimiter, characterRoutes);
+
+// Make game engine available to AI routes
+app.set('gameEngine', gameEngine);
+
 app.use('/api/ai', aiRoutes);
 app.use('/api/roles', roleManagementRoutes);
 

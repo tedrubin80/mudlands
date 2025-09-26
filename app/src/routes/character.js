@@ -9,7 +9,7 @@ const GameLogger = require('../utils/logger');
 const CSRFProtection = require('../middleware/csrf');
 
 // Character creation endpoint
-router.post('/create', CSRFProtection.rotateToken, async (req, res) => {
+router.post('/create', async (req, res) => {
     try {
         const { name, class: className, stats, description, email, password } = req.body;
 

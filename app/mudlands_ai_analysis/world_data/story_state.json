@@ -2,8 +2,8 @@
   "day": 1,
   "currentPhase": "rebuilding",
   "faction_tensions": {
-    "restoration_vs_adaptation": 50,
-    "human_vs_beastkin": 60,
+    "restoration_vs_adaptation": 55,
+    "human_vs_beastkin": 66,
     "trust_in_council": 58,
     "shadowblight_awareness": 20,
     "religious_fervor": 40,

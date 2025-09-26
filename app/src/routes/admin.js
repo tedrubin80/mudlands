@@ -6,6 +6,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const CSRFProtection = require('../middleware/csrf');
 const GameLogger = require('../utils/logger');
 const { pool } = require('../config/database');
@@ -466,6 +467,722 @@ router.post('/broadcast', authenticateAdmin, CSRFProtection.verifyToken, async (
         res.status(500).json({
             success: false,
             message: 'Broadcast failed'
+        });
+    }
+});
+
+/**
+ * Update player level
+ */
+router.post('/players/:playerId/level', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { playerId } = req.params;
+        const { level } = req.body;
+
+        if (!level || level < 1 || level > 99) {
+            return res.status(400).json({
+                success: false,
+                message: 'Level must be between 1 and 99'
+            });
+        }
+
+        // Update in database
+        await pool.query(`
+            UPDATE player_stats
+            SET level = $1, experience = $2
+            WHERE player_id = $3
+        `, [level, level * 1000, playerId]);
+
+        // If player is online, update in game engine
+        if (gameEngine) {
+            const activePlayer = gameEngine.getPlayerById(playerId);
+            if (activePlayer) {
+                activePlayer.level = level;
+                activePlayer.experience = level * 1000;
+                activePlayer.recalculateStats();
+            }
+        }
+
+        GameLogger.info('Admin updated player level', {
+            admin: req.admin.username,
+            playerId,
+            newLevel: level
+        });
+
+        res.json({
+            success: true,
+            message: `Player level updated to ${level}`
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin level update error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update player level'
+        });
+    }
+});
+
+/**
+ * Update player stats (HP, MP, Gold)
+ */
+router.post('/players/:playerId/stats', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { playerId } = req.params;
+        const { hp, mp, gold } = req.body;
+
+        const updates = [];
+        const values = [];
+        let paramCount = 0;
+
+        if (hp !== undefined) {
+            updates.push(`current_hp = $${++paramCount}`);
+            values.push(hp);
+        }
+        if (mp !== undefined) {
+            updates.push(`current_mp = $${++paramCount}`);
+            values.push(mp);
+        }
+        if (gold !== undefined) {
+            updates.push(`gold = $${++paramCount}`);
+            values.push(gold);
+        }
+
+        if (updates.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No valid stats to update'
+            });
+        }
+
+        values.push(playerId);
+        await pool.query(`
+            UPDATE player_stats
+            SET ${updates.join(', ')}
+            WHERE player_id = $${++paramCount}
+        `, values);
+
+        // Update active player if online
+        if (gameEngine) {
+            const activePlayer = gameEngine.getPlayerById(playerId);
+            if (activePlayer) {
+                if (hp !== undefined) activePlayer.currentHp = hp;
+                if (mp !== undefined) activePlayer.currentMp = mp;
+                if (gold !== undefined) activePlayer.gold = gold;
+            }
+        }
+
+        GameLogger.info('Admin updated player stats', {
+            admin: req.admin.username,
+            playerId,
+            updates: { hp, mp, gold }
+        });
+
+        res.json({
+            success: true,
+            message: 'Player stats updated successfully'
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin stats update error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update player stats'
+        });
+    }
+});
+
+/**
+ * Get AI characters
+ */
+router.get('/ai-characters', authenticateAdmin, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const path = require('path');
+
+        const aiCharactersPath = path.join(__dirname, '../../mudlands_ai_analysis/character_profiles/manual_test_queue/ready_for_testing');
+        const activationConfigPath = path.join(__dirname, '../../mudlands_ai_analysis/character_profiles/auto_players/activation_config.json');
+
+        // Get real-time AI character status from the game engine
+        const gameEngine = req.app.get('gameEngine');
+        let activeAICharacters = [];
+
+        if (gameEngine && gameEngine.aiCharacterController) {
+            const report = gameEngine.aiCharacterController.getStatusReport();
+            activeAICharacters = report.activeCharacters || [];
+        }
+
+        // Read AI character profiles from ready_for_testing
+        const characterFiles = await fs.readdir(aiCharactersPath);
+        const characters = [];
+
+        for (const file of characterFiles) {
+            if (file.endsWith('.json')) {
+                const filePath = path.join(aiCharactersPath, file);
+                const characterData = JSON.parse(await fs.readFile(filePath, 'utf8'));
+
+                // Check if this character is currently active in the AI system
+                const isActiveInAI = activeAICharacters.find(ac => ac.id === characterData.metadata.character_id);
+
+                characters.push({
+                    id: characterData.metadata.character_id,
+                    name: characterData.character_data.name,
+                    level: characterData.character_data.level,
+                    location: characterData.character_data.location,
+                    status: characterData.metadata.status,
+                    lastUpdated: characterData.metadata.last_updated,
+                    personality: characterData.ai_behavior_config.personality_traits.join(', '),
+                    filePath: file,
+                    // Add real-time AI status
+                    isActiveInAI: !!isActiveInAI,
+                    currentBehavior: isActiveInAI?.currentBehavior || null,
+                    aiStats: isActiveInAI?.stats || null
+                });
+            }
+        }
+
+        // Also check active directory for characters that might be active but not in ready_for_testing
+        const activePath = path.join(__dirname, '../../mudlands_ai_analysis/character_profiles/auto_players/active');
+        try {
+            const activeFiles = await fs.readdir(activePath);
+            for (const file of activeFiles) {
+                if (file.endsWith('.json')) {
+                    const filePath = path.join(activePath, file);
+                    const characterData = JSON.parse(await fs.readFile(filePath, 'utf8'));
+
+                    // Check if we already have this character from ready_for_testing
+                    if (!characters.find(c => c.id === characterData.metadata.character_id)) {
+                        const isActiveInAI = activeAICharacters.find(ac => ac.id === characterData.metadata.character_id);
+
+                        characters.push({
+                            id: characterData.metadata.character_id,
+                            name: characterData.character_data.name,
+                            level: characterData.character_data.level,
+                            location: characterData.character_data.location,
+                            status: 'active',
+                            lastUpdated: characterData.metadata.last_updated,
+                            personality: characterData.ai_behavior_config.personality_traits.join(', '),
+                            filePath: file,
+                            isActiveInAI: !!isActiveInAI,
+                            currentBehavior: isActiveInAI?.currentBehavior || null,
+                            aiStats: isActiveInAI?.stats || null
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            // Active directory might not exist
+        }
+
+        // Read activation config
+        let activationConfig = {};
+        try {
+            activationConfig = JSON.parse(await fs.readFile(activationConfigPath, 'utf8'));
+        } catch (e) {
+            // File might not exist yet
+        }
+
+        res.json({
+            success: true,
+            characters,
+            activationConfig
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin AI characters error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get AI characters'
+        });
+    }
+});
+
+/**
+ * Update AI character activation
+ */
+router.post('/ai-characters/:characterId/activate', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { characterId } = req.params;
+        const { active, schedule } = req.body;
+
+        const fs = require('fs').promises;
+        const path = require('path');
+        const activationConfigPath = path.join(__dirname, '../../mudlands_ai_analysis/character_profiles/auto_players/activation_config.json');
+
+        let config = {};
+        try {
+            config = JSON.parse(await fs.readFile(activationConfigPath, 'utf8'));
+        } catch (e) {
+            // Create new config if file doesn't exist
+            config = { characters: {} };
+        }
+
+        if (active) {
+            config.characters[characterId] = {
+                active: true,
+                schedule: schedule || ['11:00', '18:00'],
+                lastActivated: null
+            };
+        } else {
+            delete config.characters[characterId];
+        }
+
+        await fs.writeFile(activationConfigPath, JSON.stringify(config, null, 2));
+
+        GameLogger.info('Admin updated AI character activation', {
+            admin: req.admin.username,
+            characterId,
+            active,
+            schedule
+        });
+
+        res.json({
+            success: true,
+            message: `AI character ${active ? 'activated' : 'deactivated'}`
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin AI activation error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update AI character activation'
+        });
+    }
+});
+
+/**
+ * Manually trigger AI character
+ */
+router.post('/ai-characters/:characterId/trigger', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { characterId } = req.params;
+
+        // Execute the AI character scheduler for this specific character
+        const { spawn } = require('child_process');
+        const schedulerPath = path.join(__dirname, '../../mudlands_ai_analysis/auto_character_scheduler.js');
+
+        const child = spawn('node', [schedulerPath, '--character', characterId], {
+            cwd: path.join(__dirname, '../../'),
+            stdio: 'pipe'
+        });
+
+        let output = '';
+        child.stdout.on('data', (data) => {
+            output += data.toString();
+        });
+
+        child.on('close', (code) => {
+            GameLogger.info('Admin triggered AI character', {
+                admin: req.admin.username,
+                characterId,
+                exitCode: code,
+                output: output.substring(0, 500)
+            });
+
+            res.json({
+                success: code === 0,
+                message: code === 0 ? 'AI character triggered successfully' : 'AI character trigger failed',
+                output: output
+            });
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin AI trigger error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to trigger AI character'
+        });
+    }
+});
+
+/**
+ * Delete player character
+ */
+router.delete('/players/:playerId', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { playerId } = req.params;
+
+        // First disconnect if online
+        if (gameEngine) {
+            const activePlayer = gameEngine.getPlayerById(playerId);
+            if (activePlayer) {
+                gameEngine.kickPlayer(playerId, 'Character deleted by admin');
+            }
+        }
+
+        // Delete from database
+        await pool.query('BEGIN');
+        await pool.query('DELETE FROM player_stats WHERE player_id = $1', [playerId]);
+        await pool.query('DELETE FROM players WHERE id = $1', [playerId]);
+        await pool.query('COMMIT');
+
+        GameLogger.info('Admin deleted player', {
+            admin: req.admin.username,
+            playerId
+        });
+
+        res.json({
+            success: true,
+            message: 'Player deleted successfully'
+        });
+
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        GameLogger.error('Admin delete player error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete player'
+        });
+    }
+});
+
+/**
+ * AI Content Generation endpoint
+ */
+router.post('/ai/generate', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { type, prompt, parameters } = req.body;
+
+        // Get AI Content Service
+        const { getInstance } = require('../services/AIContentService');
+        const aiService = getInstance();
+
+        // Determine generation method based on type
+        let content;
+        switch(type) {
+            case 'npc':
+                content = await aiService.generateNPC(
+                    parameters?.location || 'Unknown Location',
+                    parameters?.npcType || 'commoner',
+                    parameters?.importance || 'minor',
+                    prompt || 'Generate a friendly NPC for a fantasy game'
+                );
+                break;
+            case 'quest':
+                content = await aiService.generateQuest(
+                    parameters?.level || 5,
+                    parameters?.questType || 'fetch',
+                    parameters?.location || 'town',
+                    parameters?.difficulty || 'medium'
+                );
+                break;
+            case 'monster':
+                content = await aiService.generateMonster(
+                    parameters?.cr || 1,
+                    parameters?.environment || 'forest',
+                    parameters?.monsterType || 'beast',
+                    parameters?.role || 'solo'
+                );
+                break;
+            case 'item':
+                content = await aiService.generateItem(
+                    parameters?.rarity || 'common',
+                    parameters?.itemType || 'weapon',
+                    parameters?.level || 1,
+                    parameters?.theme || 'standard'
+                );
+                break;
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: `Unknown content type: ${type}`
+                });
+        }
+
+        GameLogger.info('AI content generated', {
+            admin: req.admin.username,
+            type,
+            contentPreview: content?.name || content?.title || 'Generated content'
+        });
+
+        res.json({
+            success: true,
+            content,
+            type,
+            generatedAt: new Date().toISOString()
+        });
+
+    } catch (error) {
+        GameLogger.error('AI content generation failed', {
+            error: error.message,
+            admin: req.admin.username
+        });
+        res.status(500).json({
+            success: false,
+            message: `AI generation failed: ${error.message}`
+        });
+    }
+});
+
+/**
+ * AI Activity Log endpoint
+ */
+router.get('/ai/activity-log', authenticateAdmin, async (req, res) => {
+    try {
+        // Read recent AI activity from implementation logs
+        const fs = require('fs');
+        const glob = require('glob');
+
+        const logsPath = path.join(__dirname, '../../mudlands_ai_analysis/implementation_logs');
+
+        // Get recent character stats files
+        const statFiles = glob.sync('character_stats_*.json', { cwd: logsPath });
+
+        const activities = [];
+
+        for (const file of statFiles.slice(-10)) { // Last 10 files
+            try {
+                const filePath = path.join(logsPath, file);
+                const stats = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+                if (stats.memory?.recentInteractions) {
+                    stats.memory.recentInteractions.forEach(interaction => {
+                        activities.push({
+                            character: stats.characterId,
+                            message: `Interacted with ${interaction.playerName} during ${interaction.behavior}`,
+                            timestamp: interaction.timestamp,
+                            type: 'interaction'
+                        });
+                    });
+                }
+
+                // Add activation events
+                if (stats.stats?.activations > 0) {
+                    activities.push({
+                        character: stats.characterId,
+                        message: `Character activated (${stats.stats.activations} total activations)`,
+                        timestamp: new Date(stats.lastActive).getTime(),
+                        type: 'activation'
+                    });
+                }
+            } catch (err) {
+                // Skip invalid files
+                continue;
+            }
+        }
+
+        // Sort by timestamp, most recent first
+        activities.sort((a, b) => b.timestamp - a.timestamp);
+
+        res.json({
+            success: true,
+            activities: activities.slice(0, 50) // Return last 50 activities
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to load AI activity log', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to load activity log',
+            activities: []
+        });
+    }
+});
+
+/**
+ * Trigger all active AI characters
+ */
+router.post('/ai-characters/trigger-all', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        // Get list of active AI characters
+        const fs = require('fs');
+        const activeDir = path.join(__dirname, '../../mudlands_ai_analysis/character_profiles/auto_players/active');
+
+        if (!fs.existsSync(activeDir)) {
+            return res.json({
+                success: true,
+                message: 'No active AI characters found',
+                count: 0
+            });
+        }
+
+        const activeFiles = fs.readdirSync(activeDir).filter(file => file.endsWith('.json'));
+
+        // Trigger each active character
+        let triggeredCount = 0;
+        for (const file of activeFiles) {
+            try {
+                const { spawn } = require('child_process');
+                const schedulerPath = path.join(__dirname, '../../mudlands_ai_analysis/auto_character_scheduler.js');
+                const characterId = file.replace('.json', '');
+
+                const child = spawn('node', [schedulerPath, '--character', characterId], {
+                    cwd: path.join(__dirname, '../../'),
+                    stdio: 'pipe',
+                    detached: true
+                });
+
+                child.unref(); // Allow process to continue independently
+                triggeredCount++;
+
+            } catch (err) {
+                GameLogger.error('Failed to trigger AI character', {
+                    character: file,
+                    error: err.message
+                });
+            }
+        }
+
+        GameLogger.info('Triggered all active AI characters', {
+            admin: req.admin.username,
+            count: triggeredCount
+        });
+
+        res.json({
+            success: true,
+            message: `Triggered ${triggeredCount} AI characters`,
+            count: triggeredCount
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to trigger all AI characters', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to trigger AI characters'
+        });
+    }
+});
+
+/**
+ * AI Service health check and restart
+ */
+router.post('/ai/restart', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        // Get AI service and restart it
+        const { getInstance } = require('../services/AIContentService');
+        const aiService = getInstance();
+
+        // Shutdown current instance
+        await aiService.shutdown();
+
+        // Re-initialize (this will create a new singleton instance)
+        delete require.cache[require.resolve('../services/AIContentService')];
+        const { getInstance: getNewInstance } = require('../services/AIContentService');
+        const newAiService = getNewInstance();
+
+        GameLogger.info('AI service restarted', {
+            admin: req.admin.username
+        });
+
+        res.json({
+            success: true,
+            message: 'AI service restarted successfully'
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to restart AI service', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to restart AI service'
+        });
+    }
+});
+
+/**
+ * Export AI logs
+ */
+router.get('/ai/export-logs', authenticateAdmin, async (req, res) => {
+    try {
+        const fs = require('fs');
+        const archiver = require('archiver');
+
+        const logsPath = path.join(__dirname, '../../mudlands_ai_analysis/implementation_logs');
+
+        if (!fs.existsSync(logsPath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'AI logs directory not found'
+            });
+        }
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename=ai_logs_${new Date().toISOString().split('T')[0]}.zip`);
+
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.pipe(res);
+
+        // Add all log files to archive
+        archive.directory(logsPath, 'ai_logs');
+
+        await archive.finalize();
+
+        GameLogger.info('AI logs exported', {
+            admin: req.admin.username
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to export AI logs', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to export logs'
+        });
+    }
+});
+
+/**
+ * Clear AI cache
+ */
+router.post('/ai/clear-cache', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const { getInstance } = require('../services/AIContentService');
+        const aiService = getInstance();
+
+        // Clear the Redis cache if available
+        if (aiService.cacheClient) {
+            await aiService.cacheClient.flushDb();
+        }
+
+        GameLogger.info('AI cache cleared', {
+            admin: req.admin.username
+        });
+
+        res.json({
+            success: true,
+            message: 'AI cache cleared successfully'
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to clear AI cache', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to clear AI cache'
+        });
+    }
+});
+
+/**
+ * Admin logout endpoint
+ */
+router.post('/logout', async (req, res) => {
+    try {
+        // Clear the session if it exists
+        if (req.session) {
+            req.session.destroy((err) => {
+                if (err) {
+                    console.log('Session destroy error:', err);
+                }
+            });
+        }
+
+        // Clear any cookies
+        res.clearCookie('connect.sid');
+        res.clearCookie('adminToken');
+
+        GameLogger.info('Admin logout successful', {
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        res.json({
+            success: true,
+            message: 'Logout successful'
+        });
+
+    } catch (error) {
+        GameLogger.error('Admin logout error', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Logout failed'
         });
     }
 });

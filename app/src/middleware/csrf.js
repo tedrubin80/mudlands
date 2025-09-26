@@ -48,9 +48,17 @@ class CSRFProtection {
             return next();
         }
 
-        // Skip CSRF for registration and login endpoints (they have other protections)
+        // Skip CSRF for registration, login, and character creation endpoints (they have other protections)
         if (req.url === '/auth/register' || req.url === '/auth/login' ||
-            req.originalUrl === '/api/auth/register' || req.originalUrl === '/api/auth/login') {
+            req.url === '/character/create' ||
+            req.originalUrl === '/api/auth/register' || req.originalUrl === '/api/auth/login' ||
+            req.originalUrl === '/api/character/create') {
+            return next();
+        }
+
+        // Skip CSRF for AI character activation endpoints (internal system calls)
+        if (req.originalUrl.includes('/api/ai/characters/') ||
+            req.originalUrl.includes('/api/ai/story/')) {
             return next();
         }
 
