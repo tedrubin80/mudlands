@@ -201,7 +201,8 @@ router.post('/login', /* CSRFProtection.rotateToken, */ async (req, res) => {
                     dex: playerData.dex,
                     luk: playerData.luk
                 },
-                location: playerData.location
+                location: playerData.location,
+                is_admin: playerData.is_admin || false
             }
         });
 

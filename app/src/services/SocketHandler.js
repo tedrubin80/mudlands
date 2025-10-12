@@ -131,7 +131,8 @@ class SocketHandler {
                     level: player.level,
                     className: player.className,
                     stats: player.stats,
-                    location: player.location
+                    location: player.location,
+                    is_admin: player.isAdmin || false
                 }
             });
 

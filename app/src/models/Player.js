@@ -417,7 +417,8 @@ class Player {
             craftingRecipeName: this.craftingRecipeName,
             craftingTimeTotal: this.craftingTimeTotal,
             createdAt: this.createdAt,
-            lastLogin: this.lastLogin
+            lastLogin: this.lastLogin,
+            is_admin: this.isAdmin
         };
     }
 }
