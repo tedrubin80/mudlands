@@ -23,8 +23,7 @@
       "name": "Adventurer's Guild Hall",
       "description": "The grand hall of the Adventurer's Guild rises before you with vaulted ceilings supported by marble pillars. Quest boards line the walls, covered in notices seeking brave souls for dangerous missions. Behind an ornate desk sits the Guild Master, while seasoned adventurers discuss strategies near a roaring fireplace.",
       "exits": {
-        "south": "town_square",
-        "east": "guild_storage"
+        "south": "town_square"
       },
       "properties": {
         "safe": true,

@@ -85,6 +85,19 @@ class World {
         if (this.worldData.rooms) {
             this.worldData.rooms.forEach(roomData => {
                 const room = new Room(roomData);
+
+                // Load NPCs for this room
+                if (roomData.npcs && roomData.npcs.length > 0) {
+                    roomData.npcs.forEach(npcId => {
+                        if (npcTemplates[npcId]) {
+                            // NPCs are already instantiated objects, just use them directly
+                            const npc = npcTemplates[npcId];
+                            this.npcs.set(npc.id, npc);
+                            room.addNpc(npc);
+                        }
+                    });
+                }
+
                 this.rooms.set(room.id, room);
             });
         }

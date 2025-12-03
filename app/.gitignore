@@ -1,0 +1,42 @@
+# Environment variables - NEVER commit secrets
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+*.log.*
+/root/.pm2/logs/
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+test-*.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database
+*.sqlite
+*.db
+
+# PM2
+.pm2/
+pids/
+*.pid
+*.seed
+*.pid.lock

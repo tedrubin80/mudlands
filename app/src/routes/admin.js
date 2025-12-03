@@ -1187,6 +1187,450 @@ router.post('/logout', async (req, res) => {
     }
 });
 
+// ============================================================================
+// AI NPC & STORY MONITORING ENDPOINTS
+// ============================================================================
+
+/**
+ * GET /api/admin/ai-npcs/status
+ * Get real-time status of all AI-controlled NPCs
+ */
+router.get('/ai-npcs/status', authenticateAdmin, async (req, res) => {
+    try {
+        const aiCharacterController = gameEngine?.aiCharacterController;
+
+        if (!aiCharacterController) {
+            return res.json({
+                success: true,
+                npcs: [],
+                message: 'AI Character Controller not active'
+            });
+        }
+
+        const statusReport = aiCharacterController.getStatusReport();
+
+        // Enhance with location data
+        const npcsWithLocations = statusReport.activeCharacters.map(npc => {
+            // Find NPC in world
+            let location = 'unknown';
+            let roomName = 'Unknown';
+
+            for (const [roomId, room] of Object.entries(gameEngine.world.rooms)) {
+                const foundNpc = room.npcs?.find(n => n.id === npc.id);
+                if (foundNpc) {
+                    location = roomId;
+                    roomName = room.name;
+                    break;
+                }
+            }
+
+            return {
+                ...npc,
+                location,
+                roomName
+            };
+        });
+
+        res.json({
+            success: true,
+            npcs: npcsWithLocations,
+            totalStats: statusReport.totalStats,
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to get AI NPC status', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve AI NPC status'
+        });
+    }
+});
+
+/**
+ * GET /api/admin/story/state
+ * Get current story evolution state
+ */
+router.get('/story/state', authenticateAdmin, async (req, res) => {
+    try {
+        const fs = require('fs');
+        const storyStatePath = path.join(__dirname, '../../mudlands_ai_analysis/world_data/story_state.json');
+
+        if (!fs.existsSync(storyStatePath)) {
+            return res.json({
+                success: true,
+                storyState: null,
+                message: 'Story state file not found'
+            });
+        }
+
+        const storyState = JSON.parse(fs.readFileSync(storyStatePath, 'utf8'));
+
+        res.json({
+            success: true,
+            storyState,
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to get story state', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve story state'
+        });
+    }
+});
+
+/**
+ * GET /api/admin/story/recent-events
+ * Get recent story evolution events
+ */
+router.get('/story/recent-events', authenticateAdmin, async (req, res) => {
+    try {
+        const fs = require('fs');
+        const storyStatePath = path.join(__dirname, '../../mudlands_ai_analysis/world_data/story_state.json');
+
+        if (!fs.existsSync(storyStatePath)) {
+            return res.json({
+                success: true,
+                events: [],
+                message: 'Story state file not found'
+            });
+        }
+
+        const storyState = JSON.parse(fs.readFileSync(storyStatePath, 'utf8'));
+        const recentEvents = (storyState.world_events || []).slice(0, 10);
+
+        res.json({
+            success: true,
+            events: recentEvents,
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to get recent story events', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve recent events'
+        });
+    }
+});
+
+/**
+ * GET /api/admin/ai-npcs/interactions
+ * Get recent AI NPC interactions with players
+ */
+router.get('/ai-npcs/interactions', authenticateAdmin, async (req, res) => {
+    try {
+        const fs = require('fs');
+        const glob = require('glob');
+        const logsPath = path.join(__dirname, '../../mudlands_ai_analysis/implementation_logs');
+
+        const interactions = [];
+
+        // Get recent character stats files
+        const statFiles = glob.sync('character_stats_*.json', { cwd: logsPath });
+
+        for (const file of statFiles.slice(-5)) { // Last 5 files
+            try {
+                const filePath = path.join(logsPath, file);
+                const stats = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+                if (stats.memory?.recentInteractions) {
+                    stats.memory.recentInteractions.forEach(interaction => {
+                        interactions.push({
+                            character: stats.characterId || 'Unknown',
+                            characterName: stats.characterName || 'Unknown NPC',
+                            playerName: interaction.playerName,
+                            behavior: interaction.behavior,
+                            timestamp: interaction.timestamp,
+                            type: 'interaction'
+                        });
+                    });
+                }
+            } catch (err) {
+                // Skip invalid files
+                continue;
+            }
+        }
+
+        // Sort by timestamp, most recent first
+        interactions.sort((a, b) => b.timestamp - a.timestamp);
+
+        res.json({
+            success: true,
+            interactions: interactions.slice(0, 20), // Return last 20 interactions
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        GameLogger.error('Failed to get AI NPC interactions', { error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve interactions'
+        });
+    }
+});
+
+// ============================================================================
+// ITEM/WEAPON MANAGEMENT ENDPOINTS
+// ============================================================================
+
+/**
+ * GET /api/admin/items
+ * Get all items from the items database
+ */
+router.get('/items', authenticateAdmin, async (req, res) => {
+    try {
+        const itemTemplates = require('../data/items');
+        const items = Object.values(itemTemplates);
+
+        res.json(items);
+    } catch (error) {
+        GameLogger.error('Failed to get items', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to retrieve items' });
+    }
+});
+
+/**
+ * POST /api/admin/items
+ * Create or update an item
+ */
+router.post('/items', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const itemsPath = path.join(__dirname, '../data/items.js');
+
+        // Read current items file
+        const itemTemplates = require('../data/items');
+
+        // Add or update the item
+        const newItem = req.body;
+        itemTemplates[newItem.id] = newItem;
+
+        // Write back to file
+        const fileContent = `// MUDlands Online Item Database\nconst itemTemplates = ${JSON.stringify(itemTemplates, null, 4)};\n\nmodule.exports = itemTemplates;\n`;
+        await fs.writeFile(itemsPath, fileContent, 'utf8');
+
+        // Clear require cache to reload the module
+        delete require.cache[require.resolve('../data/items')];
+
+        GameLogger.info('Item saved', { itemId: newItem.id, admin: req.admin.username });
+        res.json({ success: true, message: 'Item saved successfully', item: newItem });
+    } catch (error) {
+        GameLogger.error('Failed to save item', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to save item' });
+    }
+});
+
+/**
+ * DELETE /api/admin/items/:id
+ * Delete an item
+ */
+router.delete('/items/:id', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const itemsPath = path.join(__dirname, '../data/items.js');
+        const itemTemplates = require('../data/items');
+
+        const itemId = req.params.id;
+        if (!itemTemplates[itemId]) {
+            return res.status(404).json({ success: false, error: 'Item not found' });
+        }
+
+        delete itemTemplates[itemId];
+
+        const fileContent = `// MUDlands Online Item Database\nconst itemTemplates = ${JSON.stringify(itemTemplates, null, 4)};\n\nmodule.exports = itemTemplates;\n`;
+        await fs.writeFile(itemsPath, fileContent, 'utf8');
+        delete require.cache[require.resolve('../data/items')];
+
+        GameLogger.info('Item deleted', { itemId, admin: req.admin.username });
+        res.json({ success: true, message: 'Item deleted successfully' });
+    } catch (error) {
+        GameLogger.error('Failed to delete item', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to delete item' });
+    }
+});
+
+// ============================================================================
+// MONSTER MANAGEMENT ENDPOINTS
+// ============================================================================
+
+/**
+ * GET /api/admin/monsters
+ * Get all monster templates
+ */
+router.get('/monsters', authenticateAdmin, async (req, res) => {
+    try {
+        const monstersPath = path.join(__dirname, '../data/monsters.js');
+        const fs = require('fs');
+
+        // Check if monsters file exists
+        if (!fs.existsSync(monstersPath)) {
+            return res.json([]);
+        }
+
+        const monsterTemplates = require('../data/monsters');
+        const monsters = Object.values(monsterTemplates);
+
+        res.json(monsters);
+    } catch (error) {
+        GameLogger.error('Failed to get monsters', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to retrieve monsters' });
+    }
+});
+
+/**
+ * POST /api/admin/monsters
+ * Create or update a monster
+ */
+router.post('/monsters', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const fsSync = require('fs');
+        const monstersPath = path.join(__dirname, '../data/monsters.js');
+
+        let monsterTemplates = {};
+
+        // Read current monsters file if it exists
+        if (fsSync.existsSync(monstersPath)) {
+            monsterTemplates = require('../data/monsters');
+        }
+
+        // Add or update the monster
+        const newMonster = req.body;
+        monsterTemplates[newMonster.type] = newMonster;
+
+        // Write back to file
+        const fileContent = `// MUDlands Online Monster Database\nconst monsterTemplates = ${JSON.stringify(monsterTemplates, null, 4)};\n\nmodule.exports = monsterTemplates;\n`;
+        await fs.writeFile(monstersPath, fileContent, 'utf8');
+
+        // Clear require cache to reload the module
+        delete require.cache[require.resolve('../data/monsters')];
+
+        GameLogger.info('Monster saved', { monsterType: newMonster.type, admin: req.admin.username });
+        res.json({ success: true, message: 'Monster saved successfully', monster: newMonster });
+    } catch (error) {
+        GameLogger.error('Failed to save monster', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to save monster' });
+    }
+});
+
+/**
+ * DELETE /api/admin/monsters/:type
+ * Delete a monster
+ */
+router.delete('/monsters/:type', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const monstersPath = path.join(__dirname, '../data/monsters.js');
+        const monsterTemplates = require('../data/monsters');
+
+        const monsterType = req.params.type;
+        if (!monsterTemplates[monsterType]) {
+            return res.status(404).json({ success: false, error: 'Monster not found' });
+        }
+
+        delete monsterTemplates[monsterType];
+
+        const fileContent = `// MUDlands Online Monster Database\nconst monsterTemplates = ${JSON.stringify(monsterTemplates, null, 4)};\n\nmodule.exports = monsterTemplates;\n`;
+        await fs.writeFile(monstersPath, fileContent, 'utf8');
+        delete require.cache[require.resolve('../data/monsters')];
+
+        GameLogger.info('Monster deleted', { monsterType, admin: req.admin.username });
+        res.json({ success: true, message: 'Monster deleted successfully' });
+    } catch (error) {
+        GameLogger.error('Failed to delete monster', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to delete monster' });
+    }
+});
+
+// ============================================================================
+// ROOM/WORLD MANAGEMENT ENDPOINTS
+// ============================================================================
+
+/**
+ * GET /api/admin/rooms
+ * Get all rooms from the world
+ */
+router.get('/rooms', authenticateAdmin, async (req, res) => {
+    try {
+        const rooms = gameEngine.world.getAllRooms();
+        const roomData = Array.from(rooms.values()).map(room => room.toJSON());
+
+        res.json(roomData);
+    } catch (error) {
+        GameLogger.error('Failed to get rooms', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to retrieve rooms' });
+    }
+});
+
+/**
+ * POST /api/admin/rooms
+ * Create or update a room
+ */
+router.post('/rooms', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const worldPath = path.join(__dirname, '../data/world.json');
+
+        // Read current world.json
+        const worldData = JSON.parse(await fs.readFile(worldPath, 'utf8'));
+
+        const newRoom = req.body;
+
+        // Find and update or add room
+        const roomIndex = worldData.rooms.findIndex(r => r.id === newRoom.id);
+        if (roomIndex >= 0) {
+            worldData.rooms[roomIndex] = newRoom;
+        } else {
+            worldData.rooms.push(newRoom);
+        }
+
+        // Write back to file
+        await fs.writeFile(worldPath, JSON.stringify(worldData, null, 2), 'utf8');
+
+        // Reload world in game engine
+        gameEngine.world.loadWorldFromFile();
+
+        GameLogger.info('Room saved', { roomId: newRoom.id, admin: req.admin.username });
+        res.json({ success: true, message: 'Room saved successfully', room: newRoom });
+    } catch (error) {
+        GameLogger.error('Failed to save room', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to save room' });
+    }
+});
+
+/**
+ * DELETE /api/admin/rooms/:id
+ * Delete a room
+ */
+router.delete('/rooms/:id', authenticateAdmin, CSRFProtection.verifyToken, async (req, res) => {
+    try {
+        const fs = require('fs').promises;
+        const worldPath = path.join(__dirname, '../data/world.json');
+        const worldData = JSON.parse(await fs.readFile(worldPath, 'utf8'));
+
+        const roomId = req.params.id;
+        const roomIndex = worldData.rooms.findIndex(r => r.id === roomId);
+
+        if (roomIndex < 0) {
+            return res.status(404).json({ success: false, error: 'Room not found' });
+        }
+
+        worldData.rooms.splice(roomIndex, 1);
+
+        await fs.writeFile(worldPath, JSON.stringify(worldData, null, 2), 'utf8');
+        gameEngine.world.loadWorldFromFile();
+
+        GameLogger.info('Room deleted', { roomId, admin: req.admin.username });
+        res.json({ success: true, message: 'Room deleted successfully' });
+    } catch (error) {
+        GameLogger.error('Failed to delete room', { error: error.message });
+        res.status(500).json({ success: false, error: 'Failed to delete room' });
+    }
+});
+
     return router;
 }
 

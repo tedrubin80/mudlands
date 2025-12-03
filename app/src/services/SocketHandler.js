@@ -144,10 +144,13 @@ class SocketHandler {
                 });
             }
 
-            socket.emit('message', { 
-                text: chalk.green(`Welcome back, ${player.name}!`), 
-                type: 'system' 
+            socket.emit('message', {
+                text: chalk.green(`Welcome back, ${player.name}!`),
+                type: 'system'
             });
+
+            // Send initial room data for graphical client
+            this.sendRoomUpdate(socket, player);
 
         } catch (error) {
             GameLogger.error('Authentication failed', error, { socketId: socket.id });
@@ -198,17 +201,50 @@ class SocketHandler {
         }
 
         const result = this.commandParser.parse(command, player);
-        
+
         if (result.message) {
-            socket.emit('message', { 
-                text: result.message, 
-                type: result.success ? 'game' : 'error' 
+            socket.emit('message', {
+                text: result.message,
+                type: result.success ? 'game' : 'error'
             });
+        }
+
+        // Send room update for visual commands
+        if (result.success && ['look', 'move', 'go'].some(cmd => command.toLowerCase().startsWith(cmd))) {
+            this.sendRoomUpdate(socket, player);
         }
 
         if (result.action === 'quit') {
             this.handleDisconnect(socket);
         }
+    }
+
+    sendRoomUpdate(socket, player) {
+        const room = this.gameEngine.world.getRoom(player.location);
+        if (!room) return;
+
+        const roomData = {
+            id: room.id,
+            name: room.name,
+            description: room.description,
+            exits: room.exits,
+            npcs: room.getNpcs ? room.getNpcs().map(npc => ({
+                id: npc.id,
+                name: npc.name,
+                title: npc.title
+            })) : [],
+            players: room.getPlayers().filter(p => p.id !== player.id).map(p => ({
+                id: p.id,
+                name: p.name
+            })),
+            monsters: room.getMonsters().map(m => ({
+                id: m.id,
+                name: m.name,
+                level: m.level
+            }))
+        };
+
+        socket.emit('roomUpdate', roomData);
     }
 
     async handleDisconnect(socket) {

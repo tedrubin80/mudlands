@@ -17,7 +17,7 @@ class AICharacterController extends EventEmitter {
         this.storyEventHandlers = new Map();
 
         // Load AI configurations
-        this.aiConfigPath = '/var/www/mudlands.online/app/mudlands_ai_analysis/character_profiles/auto_players/active';
+        this.aiConfigPath = '/var/www/mudlands/app/mudlands_ai_analysis/character_profiles/auto_players/active';
         this.loadAIConfigurations();
 
         // Register story event handlers
@@ -421,7 +421,7 @@ class AICharacterController extends EventEmitter {
     // Save character statistics and memory
     saveCharacterStats(aiChar) {
         const statsFile = path.join(
-            '/var/www/mudlands.online/app/mudlands_ai_analysis/implementation_logs',
+            '/var/www/mudlands/app/mudlands_ai_analysis/implementation_logs',
             `character_stats_${aiChar.id}.json`
         );
 

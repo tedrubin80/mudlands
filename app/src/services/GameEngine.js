@@ -5,6 +5,7 @@ const CombatSystem = require('./CombatSystem');
 const QuestManager = require('./QuestManager');
 const CraftingSystem = require('../systems/CraftingSystem');
 const AICharacterController = require('./AICharacterController');
+const DailyStoryEvolution = require('./DailyStoryEvolution');
 const GameLogger = require('../utils/logger');
 
 class GameEngine extends EventEmitter {
@@ -21,6 +22,9 @@ class GameEngine extends EventEmitter {
 
         // Initialize AI Character Controller
         this.aiCharacterController = null; // Will be initialized after socket handler is ready
+
+        // Initialize Daily Story Evolution
+        this.storyEvolution = new DailyStoryEvolution(this);
     }
 
     async initialize() {
@@ -31,6 +35,10 @@ class GameEngine extends EventEmitter {
         this.world.spawnRoomItems();
         this.startGameLoop();
         this.startAutoSave();
+
+        // Start Daily Story Evolution service
+        await this.storyEvolution.start();
+
         GameLogger.gameEvent('engine_initialize_complete');
     }
 
@@ -274,6 +282,9 @@ class GameEngine extends EventEmitter {
         if (this.aiCharacterController) {
             // AI Character Controller doesn't have a shutdown method, but we should clear active characters
             this.aiCharacterController = null;
+        }
+        if (this.storyEvolution) {
+            this.storyEvolution.stop();
         }
         GameLogger.gameEvent('engine_shutdown_complete');
     }

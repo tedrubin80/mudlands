@@ -319,6 +319,86 @@ const npcs = {
         location: 'deep_forest_grove',
         mood: 'wary',
         trust_level: 10
+    }),
+
+    guild_master: new NPC({
+        id: 'guild_master',
+        name: 'Aldric Stoneheart',
+        title: 'Guild Master',
+        race: 'human',
+        gender: 'male',
+        age: 'middle-aged',
+        appearance: {
+            height: 'tall',
+            build: 'sturdy build',
+            hair: 'graying brown hair',
+            eyes: 'piercing blue eyes',
+            clothing: 'fine leather armor with guild insignia',
+            distinguishing: ['battle scars', 'commanding presence', 'guild medallion']
+        },
+        personality: {
+            values: ['honor', 'courage', 'protecting the realm'],
+            objectives: ['train new adventurers', 'coordinate guild missions'],
+            identity: 'experienced adventurer turned mentor',
+            conflicts: ['balancing safety with adventure'],
+            emotions: ['stern but fair', 'protective', 'wise']
+        },
+        speech: {
+            greeting: "Welcome to the Adventurer's Guild. What brings you here, adventurer?",
+            farewell: "May fortune favor your journey. The guild is always here if you need us.",
+            patterns: ['authoritative', 'encouraging to capable adventurers'],
+            vocabulary: 'formal but accessible',
+            accent: 'none'
+        },
+        knowledge: {
+            topics: ['quests', 'guild services', 'monster lore', 'adventuring tips', 'local dangers'],
+            secrets: ['knows about ancient threats'],
+            rumors: ['hears reports from all adventurers'],
+            specialties: ['quest assignment', 'tactical advice', 'monster knowledge']
+        },
+        location: 'guild_hall',
+        mood: 'professional',
+        trust_level: 50
+    }),
+
+    quest_clerk: new NPC({
+        id: 'quest_clerk',
+        name: 'Elara Swift',
+        title: 'Quest Clerk',
+        race: 'half-elf',
+        gender: 'female',
+        age: 'young adult',
+        appearance: {
+            height: 'average height',
+            build: 'slender build',
+            hair: 'long auburn hair tied back',
+            eyes: 'bright green eyes',
+            clothing: 'practical clerk\'s robes with ink stains',
+            distinguishing: ['spectacles', 'quill behind ear', 'organized demeanor']
+        },
+        personality: {
+            values: ['organization', 'efficiency', 'helping adventurers'],
+            objectives: ['manage quest postings', 'track completions'],
+            identity: 'dedicated guild administrator',
+            conflicts: ['too much paperwork, not enough time'],
+            emotions: ['busy', 'helpful', 'slightly frazzled']
+        },
+        speech: {
+            greeting: "Hello! Here to check the quest board or turn in a completion?",
+            farewell: "Good luck out there! Don't forget to report back when you're done!",
+            patterns: ['quick speech', 'enthusiastic', 'uses guild terminology'],
+            vocabulary: 'common with technical terms',
+            accent: 'slight elvish lilt'
+        },
+        knowledge: {
+            topics: ['available quests', 'quest rewards', 'quest requirements', 'completion procedures'],
+            secrets: ['knows which quests are most urgent'],
+            rumors: ['overhears adventurer stories'],
+            specialties: ['quest management', 'record keeping', 'guild procedures']
+        },
+        location: 'guild_hall',
+        mood: 'helpful',
+        trust_level: 60
     })
 };
 

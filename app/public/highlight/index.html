@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUDlands Online - Feature Showcase</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9A%94%EF%B8%8F</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-darker: #050508;
+            --bg-card: #12121a;
+            --accent: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.3);
+            --accent-secondary: #00ccff;
+            --accent-warning: #ffaa00;
+            --accent-danger: #ff4466;
+            --text: #e8e8e8;
+            --text-dim: #888;
+            --border: #2a2a3a;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(0, 255, 136, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 204, 255, 0.1) 0%, transparent 40%),
+                var(--bg-darker);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ff88' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--accent);
+            text-shadow:
+                0 0 20px var(--accent-glow),
+                0 0 40px var(--accent-glow),
+                0 0 60px var(--accent-glow);
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow); }
+            to { text-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow), 0 0 80px var(--accent-glow); }
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            color: var(--text);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .scroll-indicator svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--accent);
+            opacity: 0.6;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav.visible {
+            transform: translateY(0);
+        }
+
+        .nav-logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .feature-description {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Screenshot Showcase */
+        .screenshot-section {
+            background: var(--bg-darker);
+            padding: 6rem 2rem;
+        }
+
+        .screenshot-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .screenshot-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .screenshot-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .screenshot-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-caption {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        /* NPC Showcase */
+        .npc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .npc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .npc-card:hover {
+            border-color: var(--accent-secondary);
+            transform: translateY(-3px);
+        }
+
+        .npc-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .npc-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .npc-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .npc-title {
+            color: var(--accent);
+            font-size: 0.85rem;
+        }
+
+        .npc-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .trait-tag {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        /* Admin Panel Showcase */
+        .admin-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .admin-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 68, 102, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .admin-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-card-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Command Reference */
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .command-category {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .command-category-title {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .command-list {
+            list-style: none;
+        }
+
+        .command-item {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .command-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-name {
+            color: var(--accent-secondary);
+        }
+
+        .command-desc {
+            color: var(--text-dim);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* AI Features */
+        .ai-feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .ai-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 204, 255, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 204, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent));
+            color: var(--bg-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .ai-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-description {
+            color: var(--text-dim);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-darker);
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-copy {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid,
+            .npc-grid,
+            .command-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 4rem 1rem;
+            }
+        }
+
+        /* Terminal Animation */
+        .terminal {
+            background: #0d0d0d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-line {
+            margin: 0.5rem 0;
+            opacity: 0;
+            animation: typeIn 0.5s ease forwards;
+        }
+
+        .terminal-line:nth-child(2) { animation-delay: 0.2s; }
+        .terminal-line:nth-child(3) { animation-delay: 0.6s; }
+        .terminal-line:nth-child(4) { animation-delay: 1s; }
+        .terminal-line:nth-child(5) { animation-delay: 1.4s; }
+        .terminal-line:nth-child(6) { animation-delay: 1.8s; }
+
+        @keyframes typeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .terminal-prompt {
+            color: var(--accent);
+        }
+
+        .terminal-output {
+            color: var(--text-dim);
+        }
+
+        .terminal-highlight {
+            color: var(--accent-warning);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <a href="#" class="nav-logo">MUDlands</a>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#gameplay">Gameplay</a></li>
+            <li><a href="#npcs">NPCs</a></li>
+            <li><a href="#admin">Admin</a></li>
+            <li><a href="#ai">AI Tools</a></li>
+            <li><a href="/">Play Now</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="logo">MUDlands Online</h1>
+            <p class="tagline">A Modern Text-Based Adventure</p>
+            <p class="hero-description">
+                Experience the nostalgia of classic MUDs reimagined for the modern era.
+                Explore a living world powered by AI, engage with dynamic NPCs, battle fearsome monsters,
+                and forge your own legend in the Realm of Shadows.
+            </p>
+            <div class="cta-buttons">
+                <a href="/" class="btn btn-primary">Start Your Adventure</a>
+                <a href="#features" class="btn btn-secondary">Explore Features</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <h2 class="section-title">Core Features</h2>
+            <p class="section-subtitle">Everything you need for an immersive text-based RPG experience</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🗡️</div>
+                <h3 class="feature-title">Dynamic Combat System</h3>
+                <p class="feature-description">Engage in strategic turn-based combat with a variety of weapons, skills, and abilities. Level up your character and unlock powerful new moves.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🗺️</div>
+                <h3 class="feature-title">Expansive World</h3>
+                <p class="feature-description">Explore interconnected rooms from bustling town squares to dangerous dungeons. Each location features unique descriptions, items, and encounters.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📜</div>
+                <h3 class="feature-title">Quest System</h3>
+                <p class="feature-description">Accept quests from NPCs, track your objectives, and earn rewards. Dynamic quest generation keeps adventures fresh and exciting.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎭</div>
+                <h3 class="feature-title">Class System</h3>
+                <p class="feature-description">Choose from multiple character classes, each with unique abilities and playstyles. Advance through tiers to unlock more powerful skills.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔨</div>
+                <h3 class="feature-title">Crafting & Trading</h3>
+                <p class="feature-description">Gather materials, craft items, and trade with other players. Build your wealth and equip yourself with the finest gear.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">Multiplayer</h3>
+                <p class="feature-description">Play alongside other adventurers in real-time. Form parties, chat, whisper, and tackle challenges together.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshot Section -->
+    <section class="screenshot-section" id="gameplay">
+        <div class="screenshot-container">
+            <div class="section-header">
+                <h2 class="section-title">Gameplay Interface</h2>
+                <p class="section-subtitle">A classic terminal aesthetic meets modern web technology</p>
+            </div>
+            <div class="screenshot-wrapper">
+                <img src="screenshots/game-interface.png" alt="MUDlands Game Interface" loading="lazy">
+            </div>
+            <p class="screenshot-caption">The main game interface showing the terminal, character stats, and navigation</p>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                </div>
+                <div class="terminal-line"><span class="terminal-prompt">> </span>look</div>
+                <div class="terminal-line terminal-output">Market Street</div>
+                <div class="terminal-line terminal-output">A busy marketplace stretches before you, filled with the sounds of haggling merchants and the aroma of exotic spices.</div>
+                <div class="terminal-line terminal-output">Exits: <span class="terminal-highlight">north, east, west, south</span></div>
+                <div class="terminal-line terminal-output">Items here: <span class="terminal-highlight">Health Potion</span></div>
+            </div>
+
+            <div class="screenshot-wrapper" style="margin-top: 3rem;">
+                <img src="screenshots/game-commands.png" alt="MUDlands Command Reference" loading="lazy">
+            </div>
+            <p class="screenshot-caption">Comprehensive command system with movement, combat, communication, and DM tools</p>
+        </div>
+    </section>
+
+    <!-- Command Reference -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Command System</h2>
+            <p class="section-subtitle">Intuitive commands for every action</p>
+        </div>
+        <div class="command-grid">
+            <div class="command-category">
+                <h3 class="command-category-title">Movement</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">north/n</span> <span class="command-desc">- Move north</span></li>
+                    <li class="command-item"><span class="command-name">south/s</span> <span class="command-desc">- Move south</span></li>
+                    <li class="command-item"><span class="command-name">east/e</span> <span class="command-desc">- Move east</span></li>
+                    <li class="command-item"><span class="command-name">west/w</span> <span class="command-desc">- Move west</span></li>
+                    <li class="command-item"><span class="command-name">up/u, down/d</span> <span class="command-desc">- Vertical movement</span></li>
+                </ul>
+            </div>
+            <div class="command-category">
+                <h3 class="command-category-title">Interaction</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">look/l</span> <span class="command-desc">- Examine surroundings</span></li>
+                    <li class="command-item"><span class="command-name">examine &lt;target&gt;</span> <span class="command-desc">- Inspect object/NPC</span></li>
+                    <li class="command-item"><span class="command-name">talk &lt;npc&gt;</span> <span class="command-desc">- Converse with NPCs</span></li>
+                    <li class="command-item"><span class="command-name">attack &lt;target&gt;</span> <span class="command-desc">- Engage in combat</span></li>
+                </ul>
+            </div>
+            <div class="command-category">
+                <h3 class="command-category-title">Inventory</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">inventory/i</span> <span class="command-desc">- Check items</span></li>
+                    <li class="command-item"><span class="command-name">get &lt;item&gt;</span> <span class="command-desc">- Pick up item</span></li>
+                    <li class="command-item"><span class="command-name">drop &lt;item&gt;</span> <span class="command-desc">- Drop item</span></li>
+                    <li class="command-item"><span class="command-name">equip &lt;item&gt;</span> <span class="command-desc">- Wear/wield gear</span></li>
+                </ul>
+            </div>
+            <div class="command-category">
+                <h3 class="command-category-title">Communication</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">say &lt;msg&gt;</span> <span class="command-desc">- Speak in room</span></li>
+                    <li class="command-item"><span class="command-name">yell &lt;msg&gt;</span> <span class="command-desc">- Shout to nearby rooms</span></li>
+                    <li class="command-item"><span class="command-name">whisper &lt;player&gt;</span> <span class="command-desc">- Private message</span></li>
+                    <li class="command-item"><span class="command-name">chat &lt;msg&gt;</span> <span class="command-desc">- Global chat</span></li>
+                </ul>
+            </div>
+            <div class="command-category">
+                <h3 class="command-category-title">DM Tools</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">roll &lt;dice&gt;</span> <span class="command-desc">- Roll dice (1d20, 3d6+2)</span></li>
+                    <li class="command-item"><span class="command-name">dm npc &lt;type&gt;</span> <span class="command-desc">- Generate NPC</span></li>
+                    <li class="command-item"><span class="command-name">dm quest &lt;level&gt;</span> <span class="command-desc">- Generate quest</span></li>
+                    <li class="command-item"><span class="command-name">dm monster</span> <span class="command-desc">- Generate monster</span></li>
+                </ul>
+            </div>
+            <div class="command-category">
+                <h3 class="command-category-title">Character</h3>
+                <ul class="command-list">
+                    <li class="command-item"><span class="command-name">stats/score</span> <span class="command-desc">- View character sheet</span></li>
+                    <li class="command-item"><span class="command-name">class</span> <span class="command-desc">- View current class</span></li>
+                    <li class="command-item"><span class="command-name">skills</span> <span class="command-desc">- View skill trees</span></li>
+                    <li class="command-item"><span class="command-name">quests</span> <span class="command-desc">- List active quests</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- NPC Showcase -->
+    <section class="section" id="npcs" style="background: var(--bg-darker); margin: 0; max-width: 100%; padding-left: 2rem; padding-right: 2rem;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div class="section-header">
+                <h2 class="section-title">AI-Powered NPCs</h2>
+                <p class="section-subtitle">Meet the inhabitants of the Realm of Shadows - each with unique personalities, knowledge, and stories</p>
+            </div>
+            <div class="npc-grid">
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🛡️</div>
+                        <div>
+                            <div class="npc-name">Marcus</div>
+                            <div class="npc-title">Town Guard</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">A dedicated guard with a stern demeanor. Knows about town security, local laws, and recent crimes. May share rumors about strange lights in the forest.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Duty</span>
+                        <span class="trait-tag">Law & Order</span>
+                        <span class="trait-tag">Protective</span>
+                    </div>
+                </div>
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🍺</div>
+                        <div>
+                            <div class="npc-name">Sarah</div>
+                            <div class="npc-title">Innkeeper</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">The warm-hearted owner of the Sleeping Dragon Inn. She knows all the local gossip and travelers' stories from distant lands.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Hospitality</span>
+                        <span class="trait-tag">Gossip</span>
+                        <span class="trait-tag">Motherly</span>
+                    </div>
+                </div>
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🔨</div>
+                        <div>
+                            <div class="npc-name">Thorin</div>
+                            <div class="npc-title">Master Blacksmith</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">A proud dwarven craftsman who knows the secrets of rare ore deposits and ancient dwarven ruins. Expert in metalworking and weapon crafting.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Craftsmanship</span>
+                        <span class="trait-tag">Dwarven</span>
+                        <span class="trait-tag">Perfectionist</span>
+                    </div>
+                </div>
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🧙</div>
+                        <div>
+                            <div class="npc-name">Aldric</div>
+                            <div class="npc-title">Court Wizard</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">An elderly mage who speaks in metaphors and guards ancient knowledge. He knows the location of powerful magical artifacts.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Arcane Lore</span>
+                        <span class="trait-tag">Wisdom</span>
+                        <span class="trait-tag">Mysterious</span>
+                    </div>
+                </div>
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🎵</div>
+                        <div>
+                            <div class="npc-name">Lyanna</div>
+                            <div class="npc-title">Wandering Bard</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">A half-elf storyteller with a silver voice. She trades tales for tales and knows embarrassing stories about nobles.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Storytelling</span>
+                        <span class="trait-tag">Musical</span>
+                        <span class="trait-tag">Adventurous</span>
+                    </div>
+                </div>
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-avatar">🌲</div>
+                        <div>
+                            <div class="npc-name">Old Oak</div>
+                            <div class="npc-title">Forest Hermit</div>
+                        </div>
+                    </div>
+                    <p class="feature-description">A cryptic nature guardian who speaks slowly and knows the location of hidden groves. Expert in herbal medicine and animal communication.</p>
+                    <div class="npc-traits">
+                        <span class="trait-tag">Nature</span>
+                        <span class="trait-tag">Herbalism</span>
+                        <span class="trait-tag">Cryptic</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel Showcase -->
+    <section class="section" id="admin">
+        <div class="section-header">
+            <h2 class="section-title">Admin Dashboard</h2>
+            <p class="section-subtitle">Powerful tools for game masters and administrators</p>
+        </div>
+        <div class="admin-features">
+            <div class="admin-card">
+                <div class="admin-card-icon">📊</div>
+                <h3 class="admin-card-title">Server Statistics</h3>
+                <p class="admin-card-desc">Real-time monitoring of players online, server uptime, and memory usage</p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">⚔️</div>
+                <h3 class="admin-card-title">Items & Weapons</h3>
+                <p class="admin-card-desc">Create, edit, and manage weapons, armor, consumables, and materials</p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">👹</div>
+                <h3 class="admin-card-title">Monster Management</h3>
+                <p class="admin-card-desc">Define monsters with custom stats, abilities, and loot tables</p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">🏰</div>
+                <h3 class="admin-card-title">World Builder</h3>
+                <p class="admin-card-desc">Create and connect rooms, design dungeons, and shape the world</p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">👥</div>
+                <h3 class="admin-card-title">Player Management</h3>
+                <p class="admin-card-desc">Monitor players, manage accounts, and moderate the community</p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-icon">📢</div>
+                <h3 class="admin-card-title">Broadcast System</h3>
+                <p class="admin-card-desc">Send server-wide announcements and manage communications</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Features -->
+    <section class="section" id="ai" style="background: var(--bg-darker); margin: 0; max-width: 100%;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div class="section-header">
+                <h2 class="section-title">AI-Powered Features</h2>
+                <p class="section-subtitle">Advanced AI integration for dynamic content generation</p>
+            </div>
+            <div class="ai-feature-grid">
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">Dynamic NPC Conversations</h3>
+                    <p class="ai-description">NPCs respond intelligently based on their personality, knowledge, and emotional state. Each conversation is unique and contextual.</p>
+                </div>
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">Quest Generation</h3>
+                    <p class="ai-description">Generate unique quests on-the-fly with appropriate difficulty, objectives, and rewards. No two adventures are the same.</p>
+                </div>
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">Story Evolution</h3>
+                    <p class="ai-description">The world evolves over time with active plot lines, faction tensions, and story events that respond to player actions.</p>
+                </div>
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">Content Generation</h3>
+                    <p class="ai-description">Admins can generate NPCs, monsters, items, and room descriptions using AI, ensuring consistent quality and endless variety.</p>
+                </div>
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">NPC Behavior System</h3>
+                    <p class="ai-description">NPCs have autonomous behaviors - they move, interact, share stories, and react to the world around them dynamically.</p>
+                </div>
+                <div class="ai-card">
+                    <span class="ai-badge">AI POWERED</span>
+                    <h3 class="ai-title">Emotional Intelligence</h3>
+                    <p class="ai-description">Track NPC emotional states and watch them respond appropriately - happy merchants offer better deals, angry guards are stricter.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-logo">MUDlands Online</div>
+        <p style="color: var(--text-dim); margin-bottom: 1rem;">A modern take on classic text-based adventures</p>
+        <div class="footer-links">
+            <a href="/">Play Now</a>
+            <a href="/admin">Admin Dashboard</a>
+            <a href="#features">Features</a>
+            <a href="#npcs">NPCs</a>
+        </div>
+        <p class="footer-copy">&copy; 2024 MUDlands Online. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Show nav on scroll
+        const nav = document.getElementById('nav');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > 100) {
+                nav.classList.add('visible');
+            } else {
+                nav.classList.remove('visible');
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.feature-card, .npc-card, .admin-card, .ai-card, .command-category').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

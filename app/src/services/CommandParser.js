@@ -249,6 +249,15 @@ class CommandParser {
             });
         }
 
+        const npcs = room.getNpcs ? room.getNpcs() : [];
+        if (npcs.length > 0) {
+            output.push(chalk.cyan('NPCs here:'));
+            npcs.forEach(npc => {
+                const displayName = npc.title ? `${npc.name}, ${npc.title}` : npc.name;
+                output.push(chalk.cyan(`  - ${displayName}`));
+            });
+        }
+
         const monsters = room.getMonsters();
         if (monsters.length > 0) {
             output.push(chalk.red('Monsters here:'));
@@ -497,28 +506,90 @@ class CommandParser {
     handleHelp(player, command) {
         if (!command) {
             let output = [];
-            output.push(chalk.cyan.bold('=== Available Commands ==='));
-            output.push(chalk.yellow('Movement:') + ' north/n, south/s, east/e, west/w, up/u, down/d, ne, nw, se, sw');
-            output.push(chalk.yellow('Interaction:') + ' look/l, examine <target>, attack/kill <target>, describe');
-            output.push(chalk.yellow('Info:') + ' stats/score, inventory/i, equipment/eq, who, time, weather');
-            output.push(chalk.yellow('Inventory:') + ' get/take <item>, drop <item>, use <item>, equip <item>, unequip <slot>');
-            output.push(chalk.yellow('Communication:') + ' say "<message>", yell "<message>", whisper <player> <message>');
-            output.push(chalk.yellow('Social:') + ' emote/me <action>, gossip, ask <topic>, talk/speak <npc> [topic]');
-            output.push(chalk.yellow('Quests:') + ' quests, quest <name>, objectives, abandon <quest>');
-            output.push(chalk.yellow('Classes:') + ' class, classes, advance <class>, skills');
-            output.push(chalk.yellow('Dice & DM:') + ' roll [dice], advantage/adv [dice], disadvantage/dis [dice], story [dice], coin/flip, dm <command>');
-            output.push(chalk.yellow('Utility:') + ' help [command], save, quit');
-            output.push('');
-            output.push(chalk.cyan('Examples:'));
-            output.push('  ' + chalk.white('roll 1d20+3') + ' - Roll a 20-sided die with +3 modifier');
-            output.push('  ' + chalk.white('advantage 1d20') + ' - Roll twice, take higher (with story outcome)');
-            output.push('  ' + chalk.white('story') + ' - Make a story roll that generates narrative events');
-            output.push('  ' + chalk.white('dm npc merchant') + ' - Generate a merchant NPC');
-            output.push('  ' + chalk.white('say "Hello everyone!"') + ' - Say something to everyone in the room');
-            output.push('  ' + chalk.white('emote waves to everyone') + ' - Perform an emote action');
-            output.push('');
-            output.push(chalk.green('Type') + ' ' + chalk.white('help <command>') + ' ' + chalk.green('for specific help on a command'));
-            
+            output.push(chalk.cyan.bold('\n╔══════════════════════════════════════════════════════════╗'));
+            output.push(chalk.cyan.bold('║              MUDLANDS - COMMAND REFERENCE               ║'));
+            output.push(chalk.cyan.bold('╚══════════════════════════════════════════════════════════╝\n'));
+
+            output.push(chalk.yellow.bold('⚔️  MOVEMENT'));
+            output.push('  • ' + chalk.white('north/n, south/s, east/e, west/w'));
+            output.push('  • ' + chalk.white('up/u, down/d, ne, nw, se, sw\n'));
+
+            output.push(chalk.yellow.bold('🔍 INTERACTION'));
+            output.push('  • ' + chalk.white('look/l') + ' - Examine your surroundings');
+            output.push('  • ' + chalk.white('examine <target>') + ' - Inspect object/NPC/player');
+            output.push('  • ' + chalk.white('attack/kill <target>') + ' - Engage in combat');
+            output.push('  • ' + chalk.white('talk/speak <npc>') + ' - Converse with NPCs\n');
+
+            output.push(chalk.yellow.bold('📊 CHARACTER INFO'));
+            output.push('  • ' + chalk.white('stats/score') + ' - View character sheet');
+            output.push('  • ' + chalk.white('inventory/i') + ' - Check items');
+            output.push('  • ' + chalk.white('equipment/eq') + ' - View equipped gear');
+            output.push('  • ' + chalk.white('who') + ' - See online players');
+            output.push('  • ' + chalk.white('time, weather') + ' - World conditions\n');
+
+            output.push(chalk.yellow.bold('🎒 INVENTORY'));
+            output.push('  • ' + chalk.white('get/take <item>') + ' - Pick up item');
+            output.push('  • ' + chalk.white('drop <item>') + ' - Drop item');
+            output.push('  • ' + chalk.white('use <item>') + ' - Consume/activate');
+            output.push('  • ' + chalk.white('equip <item>') + ' - Wear/wield equipment');
+            output.push('  • ' + chalk.white('unequip <slot>') + ' - Remove equipment\n');
+
+            output.push(chalk.yellow.bold('💬 COMMUNICATION'));
+            output.push('  • ' + chalk.white('say "<message>"') + ' - Speak in current room');
+            output.push('  • ' + chalk.white('yell "<message>"') + ' - Shout to nearby rooms');
+            output.push('  • ' + chalk.white('whisper <player> <msg>') + ' - Private message');
+            output.push('  • ' + chalk.white('chat "<message>"') + ' - Global chat channel');
+            output.push('  • ' + chalk.white('emote <action>') + ' - Perform action\n');
+
+            output.push(chalk.yellow.bold('👥 GROUPS & PARTIES'));
+            output.push('  • ' + chalk.white('group create') + ' - Start a party');
+            output.push('  • ' + chalk.white('group invite <player>') + ' - Invite to party');
+            output.push('  • ' + chalk.white('group accept') + ' - Accept invitation');
+            output.push('  • ' + chalk.white('group leave') + ' - Leave party');
+            output.push('  • ' + chalk.white('group list') + ' - View party members\n');
+
+            output.push(chalk.yellow.bold('📜 QUESTS'));
+            output.push('  • ' + chalk.white('quests') + ' - List active quests');
+            output.push('  • ' + chalk.white('quest <name>') + ' - Quest details');
+            output.push('  • ' + chalk.white('objectives') + ' - Current objectives');
+            output.push('  • ' + chalk.white('abandon <quest>') + ' - Drop quest\n');
+
+            output.push(chalk.yellow.bold('🎲 DICE ROLLING & DM TOOLS'));
+            output.push('  • ' + chalk.white('roll <dice>') + ' - Roll dice (1d20, 3d6+2)');
+            output.push('  • ' + chalk.white('advantage <dice>') + ' - Roll with advantage');
+            output.push('  • ' + chalk.white('disadvantage <dice>') + ' - Roll with disadvantage');
+            output.push('  • ' + chalk.white('story') + ' - Narrative story roll');
+            output.push('  • ' + chalk.white('coin/flip') + ' - Flip a coin');
+            output.push('  • ' + chalk.white('dm npc <type>') + ' - Generate NPC');
+            output.push('  • ' + chalk.white('dm quest <level>') + ' - Generate quest');
+            output.push('  • ' + chalk.white('dm monster <cr>') + ' - Generate monster\n');
+
+            output.push(chalk.yellow.bold('⚡ CLASSES & SKILLS'));
+            output.push('  • ' + chalk.white('class') + ' - View current class');
+            output.push('  • ' + chalk.white('classes') + ' - List available classes');
+            output.push('  • ' + chalk.white('advance <class>') + ' - Change class');
+            output.push('  • ' + chalk.white('skills') + ' - View skill trees\n');
+
+            // Show admin commands if player is admin
+            if (player.is_admin) {
+                output.push(chalk.red.bold('🛡️  ADMIN COMMANDS'));
+                output.push('  • ' + chalk.white('admin players') + ' - List all players');
+                output.push('  • ' + chalk.white('admin kick <player>') + ' - Kick player');
+                output.push('  • ' + chalk.white('admin broadcast <msg>') + ' - Server broadcast');
+                output.push('  • ' + chalk.white('admin save') + ' - Save all players');
+                output.push('  • ' + chalk.white('admin reload') + ' - Reload world data');
+                output.push('  • ' + chalk.white('admin stats') + ' - Server statistics\n');
+            }
+
+            output.push(chalk.yellow.bold('🛠️  UTILITY'));
+            output.push('  • ' + chalk.white('help [command]') + ' - Command help');
+            output.push('  • ' + chalk.white('save') + ' - Save progress');
+            output.push('  • ' + chalk.white('quit') + ' - Exit game\n');
+
+            output.push(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+            output.push(chalk.green('📚 Type') + ' ' + chalk.white.bold('help <command>') + ' ' + chalk.green('for detailed information'));
+            output.push(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
             return { success: true, message: output.join('\n') };
         }
 
@@ -694,20 +765,18 @@ class CommandParser {
         const topic = parts.slice(1).join(' ');
 
         // Get current room
-        const room = this.world.getRoom(player.currentRoom);
+        const room = this.gameEngine.world.getRoom(player.location);
         if (!room) {
             return { success: false, message: 'You cannot find anyone to talk to here.' };
         }
 
         // Find NPC in current room
-        const npc = room.npcs?.find(n => 
-            n.name.toLowerCase().includes(npcName.toLowerCase())
-        );
+        const npc = room.findNpc ? room.findNpc(npcName) : null;
 
         if (!npc) {
-            return { 
-                success: false, 
-                message: `There is no one named '${npcName}' here to talk to.` 
+            return {
+                success: false,
+                message: `There is no one named '${npcName}' here to talk to.`
             };
         }
 
