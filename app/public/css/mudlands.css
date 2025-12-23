@@ -1,0 +1,602 @@
+/**
+ * MUDlands - Main Stylesheet
+ * Retro terminal theme with CSS variables for customization
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+/* ============================================
+   CSS Variables - Theme Configuration
+   ============================================ */
+:root {
+    /* Primary Colors */
+    --primary: #00ff00;
+    --primary-glow: #00ff41;
+    --primary-dark: #00cc00;
+
+    /* Background Colors */
+    --bg-dark: #000000;
+    --bg-darker: #0a0a0a;
+    --bg-gradient-start: #0a0a0a;
+    --bg-gradient-end: #1a1a1a;
+    --bg-panel: rgba(10, 10, 20, 0.9);
+    --bg-header: #1a1a2e;
+    --bg-input: #0a0a0a;
+
+    /* Accent Colors */
+    --accent-cyan: #00ffff;
+    --accent-purple: #cc99ff;
+    --accent-orange: #ffaa00;
+    --accent-yellow: #ffff00;
+
+    /* Status Colors */
+    --error: #ff4444;
+    --combat: #ff6600;
+    --success: #00ff88;
+    --system: #ffff00;
+
+    /* Health/Mana Bars */
+    --health-start: #ff0000;
+    --health-end: #ff6666;
+    --mana-start: #0066ff;
+    --mana-end: #3399ff;
+
+    /* Admin Theme */
+    --admin-bg: rgba(80, 0, 0, 0.3);
+    --admin-border: #ff4444;
+    --admin-text: #ff8888;
+
+    /* Border Colors */
+    --border-primary: #00ff00;
+    --border-muted: #333;
+    --border-subtle: #444;
+
+    /* Typography */
+    --font-main: 'Courier Prime', monospace;
+    --font-size-base: 16px;
+    --font-size-small: 12px;
+    --font-size-tiny: 11px;
+    --font-size-header: 24px;
+
+    /* Spacing */
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+
+    /* Shadows */
+    --glow-primary: 0 0 10px var(--primary-glow);
+    --glow-cyan: 0 0 10px rgba(0, 255, 255, 0.5);
+    --glow-error: 0 0 8px rgba(255, 68, 68, 0.6);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-dark);
+    color: var(--primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ============================================
+   Layout - Game Container
+   ============================================ */
+.game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.header {
+    background: var(--bg-header);
+    border-bottom: 2px solid var(--primary);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 255, 0, 0.3);
+}
+
+.header h1 {
+    color: var(--primary-glow);
+    font-size: var(--font-size-header);
+    text-shadow: var(--glow-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-small);
+    color: #888;
+}
+
+.graphical-link {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 3px;
+    font-size: var(--font-size-tiny);
+    transition: all var(--transition-normal);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.graphical-link:hover {
+    background: rgba(0, 255, 255, 0.3);
+    box-shadow: var(--glow-cyan);
+    transform: scale(1.05);
+}
+
+/* ============================================
+   Main Content Layout
+   ============================================ */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ============================================
+   Game Output Area
+   ============================================ */
+.game-output {
+    flex: 3;
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.8);
+    border-right: 1px solid var(--border-muted);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--bg-dark);
+}
+
+.game-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+.game-output::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+.game-output::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+.sidebar {
+    flex: 1;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border-muted);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--bg-dark);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+.sidebar-section {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-muted);
+}
+
+.sidebar-section h3 {
+    color: var(--primary-glow);
+    margin-bottom: var(--spacing-sm);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   Player Info & Stats
+   ============================================ */
+.player-info {
+    font-size: var(--font-size-small);
+    line-height: 1.4;
+}
+
+.health-bar, .mana-bar {
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-tiny);
+}
+
+.bar {
+    display: flex;
+    background: #222;
+    height: 15px;
+    margin: 2px 0;
+    border: 1px solid var(--border-subtle);
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width var(--transition-normal);
+}
+
+.health-fill {
+    background: linear-gradient(90deg, var(--health-start), var(--health-end));
+}
+
+.mana-fill {
+    background: linear-gradient(90deg, var(--mana-start), var(--mana-end));
+}
+
+/* ============================================
+   Input Area
+   ============================================ */
+.input-area {
+    background: var(--bg-input);
+    border-top: 2px solid var(--primary);
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    align-items: center;
+}
+
+.prompt {
+    color: var(--primary-glow);
+    margin-right: var(--spacing-sm);
+    font-weight: bold;
+}
+
+.command-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    outline: none;
+    caret-color: var(--primary-glow);
+}
+
+.command-input::placeholder {
+    color: #666;
+}
+
+/* ============================================
+   Messages
+   ============================================ */
+.message {
+    margin: var(--spacing-xs) 0;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.system {
+    color: var(--system);
+}
+
+.error {
+    color: var(--error);
+}
+
+.combat {
+    color: var(--combat);
+}
+
+.player-speech {
+    color: var(--accent-cyan);
+}
+
+.npc-speech {
+    color: var(--accent-purple);
+}
+
+.room-description {
+    color: var(--success);
+    margin: var(--spacing-sm) 0;
+}
+
+.item-description {
+    color: var(--accent-orange);
+}
+
+.level-up {
+    color: var(--system);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--system);
+}
+
+/* ============================================
+   ASCII Art
+   ============================================ */
+.ascii-art {
+    color: #888;
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+    margin: var(--spacing-sm) 0;
+    font-family: var(--font-main);
+    white-space: pre;
+}
+
+.ascii-header {
+    color: var(--primary-glow);
+    text-align: center;
+    margin: var(--spacing-sm) 0;
+}
+
+.ascii-room {
+    color: var(--accent-cyan);
+    border: 1px solid var(--border-muted);
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.ascii-npc {
+    color: var(--accent-purple);
+    display: inline-block;
+    margin: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    border: 1px solid var(--accent-purple);
+    background: rgba(204, 153, 255, 0.1);
+}
+
+.ascii-monster {
+    color: var(--error);
+    display: inline-block;
+    margin: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    border: 1px solid var(--error);
+    background: rgba(255, 68, 68, 0.1);
+}
+
+/* ============================================
+   Online Players
+   ============================================ */
+.online-players {
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: var(--font-size-small);
+}
+
+.player-name {
+    color: var(--accent-cyan);
+    cursor: pointer;
+    margin: 2px 0;
+}
+
+.player-name:hover {
+    color: #ffffff;
+    text-shadow: 0 0 3px var(--accent-cyan);
+}
+
+/* ============================================
+   Mini-Map
+   ============================================ */
+.minimap-section {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-muted);
+}
+
+.minimap-container {
+    font-family: var(--font-main);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--primary);
+    background: rgba(0, 0, 0, 0.5);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-muted);
+    white-space: pre;
+}
+
+.minimap-current {
+    color: var(--primary-glow);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--primary-glow);
+}
+
+.minimap-discovered {
+    color: #666;
+}
+
+.minimap-unexplored {
+    color: #333;
+}
+
+/* ============================================
+   Login Screen
+   ============================================ */
+.login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-form {
+    background: var(--bg-header);
+    padding: 30px;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.login-form h2 {
+    color: var(--primary-glow);
+    margin-bottom: var(--spacing-lg);
+    text-shadow: var(--glow-primary);
+}
+
+.login-form input {
+    background: var(--bg-dark);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: var(--spacing-sm);
+    margin: var(--spacing-sm) 0;
+    width: 250px;
+    font-family: inherit;
+    border-radius: 3px;
+}
+
+.login-form button {
+    background: var(--primary);
+    color: var(--bg-dark);
+    border: none;
+    padding: 12px 24px;
+    margin: var(--spacing-sm) var(--spacing-xs);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    border-radius: 3px;
+    transition: all var(--transition-normal);
+}
+
+.login-form button:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+/* ============================================
+   Connection Status
+   ============================================ */
+.connection-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 15px;
+    font-size: var(--font-size-small);
+    font-weight: bold;
+    z-index: 1001;
+}
+
+.connected {
+    background: rgba(0, 255, 0, 0.2);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.disconnected {
+    background: rgba(255, 0, 0, 0.2);
+    color: var(--error);
+    border: 1px solid var(--error);
+}
+
+/* ============================================
+   Admin Panel
+   ============================================ */
+.admin-panel {
+    background: var(--admin-bg);
+    border: 1px solid var(--admin-border);
+}
+
+.admin-panel h3 {
+    color: var(--admin-border) !important;
+    text-shadow: 0 0 5px var(--admin-border);
+}
+
+.admin-button {
+    background: var(--admin-border);
+    color: var(--bg-dark);
+    border: none;
+    padding: 8px 12px;
+    margin: var(--spacing-xs) 0;
+    width: 100%;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--font-size-tiny);
+    font-weight: bold;
+    border-radius: 3px;
+    transition: all var(--transition-fast);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-button:hover {
+    background: #ff6666;
+    box-shadow: var(--glow-error);
+}
+
+.admin-stats {
+    font-size: 10px;
+    color: var(--admin-text);
+    line-height: 1.6;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes glow-pulse {
+    0% { text-shadow: 0 0 5px var(--primary-glow); }
+    50% { text-shadow: 0 0 15px var(--primary-glow), 0 0 20px var(--primary); }
+    100% { text-shadow: 0 0 5px var(--primary-glow); }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pulsing {
+    animation: pulse 1s infinite;
+}
+
+.glow-pulse {
+    animation: glow-pulse 2s infinite;
+}
+
+.message-new {
+    animation: fade-in 0.3s ease;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-glow {
+    text-shadow: var(--glow-primary);
+}

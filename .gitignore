@@ -76,7 +76,10 @@ dist
 
 # Gatsby files
 .cache/
-public
+/public
+
+# But include app/public (game client files)
+!app/public/
 
 # Storybook build outputs
 .out

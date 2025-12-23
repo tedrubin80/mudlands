@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Realm of Shadows - Text MUD</title>
+    <!-- Version: 3.0 - Graphics Overhaul -->
+    <link rel="stylesheet" href="/css/mudlands.css">
+</head>
+<body>
+    <div class="connection-status disconnected">Disconnected</div>
+    
+    <div class="login-screen" id="loginScreen">
+        <div class="login-form">
+            <div class="ascii-art">
+╔═══════════════════════════════════════╗
+║            REALM OF SHADOWS           ║
+║         A Text-Based Adventure        ║
+╚═══════════════════════════════════════╝
+            </div>
+            <h2>Enter the Realm</h2>
+            <div>
+                <input type="text" id="usernameInput" placeholder="Username" maxlength="20">
+            </div>
+            <div>
+                <input type="password" id="passwordInput" placeholder="Password" maxlength="50">
+            </div>
+            <div>
+                <button type="button" onclick="login()">Login</button>
+                <button type="button" onclick="register()">Register</button>
+            </div>
+            <div id="loginMessage" style="color: #ff4444; margin-top: 10px; font-size: 12px;"></div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <header class="header">
+            <h1>⚔️ REALM OF SHADOWS ⚔️</h1>
+            <div class="status-bar">
+                <span>Players Online: <span id="playerCount">0</span></span>
+                <a href="/graphical.html" class="graphical-link">🎮 Graphical Mode</a>
+                <span>Server: Alpha v0.1</span>
+                <span id="gameTime">Day 1, Morning</span>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="game-output" id="gameOutput">
+                <div class="ascii-art">
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║                                                                  ║
+    ║    Welcome to the Realm of Shadows, brave adventurer!           ║
+    ║                                                                  ║
+    ║    In this world of magic and mystery, your destiny awaits.     ║
+    ║    Type 'help' for a list of commands, or 'look' to begin       ║
+    ║    exploring your surroundings.                                  ║
+    ║                                                                  ║
+    ║    May fortune favor your journey...                             ║
+    ║                                                                  ║
+    ╚══════════════════════════════════════════════════════════════════╝
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Character</h3>
+                    <div class="player-info">
+                        <div>Name: <span id="playerName">Adventurer</span></div>
+                        <div>Level: <span id="playerLevel">1</span></div>
+                        <div>Class: <span id="playerClass">Novice</span></div>
+                        <div>Exp: <span id="playerExp">0</span>/<span id="playerExpNext">100</span></div>
+                        
+                        <div class="health-bar">
+                            HP: <span id="currentHP">100</span>/<span id="maxHP">100</span>
+                            <div class="bar">
+                                <div class="bar-fill health-fill" id="hpBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mana-bar">
+                            MP: <span id="currentMP">50</span>/<span id="maxMP">50</span>
+                            <div class="bar">
+                                <div class="bar-fill mana-fill" id="mpBar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Stats</h3>
+                    <div class="player-info">
+                        <div>STR: <span id="statSTR">10</span></div>
+                        <div>AGI: <span id="statAGI">10</span></div>
+                        <div>VIT: <span id="statVIT">10</span></div>
+                        <div>INT: <span id="statINT">10</span></div>
+                        <div>DEX: <span id="statDEX">10</span></div>
+                        <div>LUK: <span id="statLUK">10</span></div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Location</h3>
+                    <div class="player-info">
+                        <div id="currentLocation">Novice Training Grounds</div>
+                        <div style="margin-top: 10px; font-size: 11px; color: #666;">
+                            Exits: <span id="roomExits">north, south, east, west</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Online Players</h3>
+                    <div class="online-players" id="onlinePlayers">
+                        <!-- Populated dynamically from server -->
+                    </div>
+                </div>
+
+                <!-- Mini-Map Section -->
+                <div class="sidebar-section minimap-section">
+                    <h3>Map</h3>
+                    <div class="minimap-container" id="minimapContainer">
+                        <pre class="minimap-display">
+┌─────────────┐
+│             │
+│   Explore!  │
+│             │
+└─────────────┘</pre>
+                    </div>
+                    <div style="font-size: 10px; color: #666; margin-top: 5px;">
+                        Rooms: <span id="roomCount">0</span> discovered
+                    </div>
+                </div>
+
+                <!-- Admin Control Panel (Only visible for admins) -->
+                <div class="sidebar-section admin-panel hidden" id="adminPanel">
+                    <h3>🛡️ Admin Controls</h3>
+                    <div class="admin-stats" id="adminStats">
+                        <div>Total Players: <span id="adminTotalPlayers">0</span></div>
+                        <div>Server Uptime: <span id="adminUptime">0m</span></div>
+                    </div>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('admin players')">📋 View Players</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('admin stats')">📊 Server Stats</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('dm npc merchant')">👤 Generate NPC</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('dm quest 5')">📜 Generate Quest</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('dm monster 5')">⚔️ Generate Monster</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('admin save')">💾 Save All</button>
+                    <button type="button" class="admin-button" onclick="game.adminCommand('admin reload')">🔄 Reload World</button>
+                    <button type="button" class="admin-button" onclick="game.adminBroadcast()">📢 Broadcast</button>
+                    <button type="button" class="admin-button" onclick="game.adminKickPlayer()">⛔ Kick Player</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <span class="prompt">></span>
+            <input type="text" class="command-input" id="commandInput" placeholder="Enter command..." autocomplete="off">
+        </div>
+    </div>
+
+    <!-- Socket.IO Client Library - Must load BEFORE main script -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- ASCII Art and Graphics Modules -->
+    <script src="/assets/ascii/rooms.js"></script>
+    <script src="/assets/ascii/npcs.js"></script>
+    <script src="/assets/ascii/items.js"></script>
+    <script src="/js/ascii-art.js"></script>
+    <script src="/js/minimap.js"></script>
+
+    <script>
+        class MUDClient {
+            constructor() {
+                this.socket = null;
+                this.commandHistory = [];
+                this.historyIndex = -1;
+                this.isConnected = false;
+                this.player = {
+                    name: '',
+                    level: 1,
+                    class: 'Novice',
+                    hp: 100,
+                    maxHP: 100,
+                    mp: 50,
+                    maxMP: 50,
+                    exp: 0,
+                    expNext: 100,
+                    stats: { STR: 10, AGI: 10, VIT: 10, INT: 10, DEX: 10, LUK: 10 },
+                    location: 'Novice Training Grounds',
+                    is_admin: false
+                };
+
+                // Initialize graphics modules
+                this.asciiRenderer = window.asciiRenderer || new ASCIIArtRenderer();
+                this.asciiRenderer.init();
+
+                // Initialize mini-map
+                this.miniMap = new TextClientMiniMap(document.getElementById('minimapContainer'));
+
+                this.initializeUI();
+                this.loadGameData();
+            }
+            
+            initializeUI() {
+                const commandInput = document.getElementById('commandInput');
+                
+                commandInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleCommand(commandInput.value.trim());
+                        commandInput.value = '';
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.navigateHistory(-1);
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.navigateHistory(1);
+                    }
+                });
+                
+                // Auto-focus the input
+                commandInput.focus();
+                
+                // Handle login form
+                document.getElementById('usernameInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('passwordInput').focus();
+                    }
+                });
+                
+                document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.login();
+                    }
+                });
+            }
+            
+            loadGameData() {
+                // Load saved game data from localStorage
+                const savedData = localStorage.getItem('mudGameData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    if (data.player) {
+                        this.player = { ...this.player, ...data.player };
+                        this.updateUI();
+                    }
+                }
+            }
+            
+            saveGameData() {
+                const gameData = {
+                    player: this.player,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('mudGameData', JSON.stringify(gameData));
+            }
+            
+            async login() {
+                const username = document.getElementById('usernameInput').value;
+                const password = document.getElementById('passwordInput').value;
+
+                if (!username || !password) {
+                    this.showLoginMessage('Please enter both username and password.');
+                    return;
+                }
+
+                this.showLoginMessage('Connecting to realm...');
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Store the JWT token
+                        localStorage.setItem('auth_token', data.token);
+
+                        // Load player data from server
+                        this.player.name = data.player.name;
+                        this.player.level = data.player.level || 1;
+                        this.player.className = data.player.className || 'Novice';
+                        this.player.location = data.player.location || 'town_square';
+                        this.player.is_admin = data.player.is_admin || false;
+
+                        if (data.player.stats) {
+                            this.player.stats = {
+                                STR: data.player.stats.str || 10,
+                                AGI: data.player.stats.agi || 10,
+                                VIT: data.player.stats.vit || 10,
+                                INT: data.player.stats.int || 10,
+                                DEX: data.player.stats.dex || 10,
+                                LUK: data.player.stats.luk || 10
+                            };
+                        }
+
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        this.connectToServer();
+                        this.updateUI();
+                        this.updateAdminPanel();
+                        document.getElementById('commandInput').focus();
+                    } else {
+                        this.showLoginMessage(data.message || 'Login failed. Please check your credentials.');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showLoginMessage('Connection error. Please try again.');
+                }
+            }
+            
+            async register() {
+                const username = document.getElementById('usernameInput').value;
+                const password = document.getElementById('passwordInput').value;
+                const email = username + '@mudlands.online'; // Generate a default email
+
+                if (!username || !password) {
+                    this.showLoginMessage('Please enter both username and password.');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showLoginMessage('Password must be at least 6 characters.');
+                    return;
+                }
+
+                this.showLoginMessage('Creating new character...');
+
+                try {
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password, email })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Store the JWT token
+                        localStorage.setItem('auth_token', data.token);
+
+                        // Load player data from server
+                        this.player.name = data.player.name;
+                        this.player.level = data.player.level || 1;
+
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        this.connectToServer();
+                        this.updateUI();
+                        document.getElementById('commandInput').focus();
+                    } else {
+                        this.showLoginMessage(data.message || 'Registration failed. Please try a different username.');
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    this.showLoginMessage('Connection error. Please try again.');
+                }
+            }
+            
+            showLoginMessage(message) {
+                document.getElementById('loginMessage').textContent = message;
+            }
+            
+            connectToServer() {
+                // Establish real Socket.IO connection
+                this.socket = io();
+
+                // Connection event handlers
+                this.socket.on('connect', () => {
+                    console.log('Connected to server');
+                    this.isConnected = true;
+                    this.updateConnectionStatus();
+
+                    // Authenticate with JWT token
+                    const token = localStorage.getItem('auth_token');
+                    if (token) {
+                        this.socket.emit('authenticate', { token });
+                    }
+                });
+
+                this.socket.on('disconnect', () => {
+                    console.log('Disconnected from server');
+                    this.isConnected = false;
+                    this.updateConnectionStatus();
+                    this.displayMessage('error', 'Connection lost. Attempting to reconnect...');
+                });
+
+                this.socket.on('connected', (data) => {
+                    console.log('Server says:', data.message);
+                });
+
+                this.socket.on('authenticated', (data) => {
+                    console.log('Authenticated successfully', data);
+                    console.log('[ADMIN DEBUG] Socket auth data.player.is_admin =', data.player?.is_admin);
+                    this.displayMessage('system', `Authentication successful! Welcome, ${data.player.name}!`);
+
+                    // Update player data from server
+                    if (data.player) {
+                        this.player.name = data.player.name;
+                        this.player.level = data.player.level || 1;
+                        this.player.class = data.player.className || 'Novice';
+                        this.player.location = data.player.location || 'town_square';
+
+                        // CRITICAL: Only update is_admin if it's explicitly defined in socket response
+                        if (data.player.hasOwnProperty('is_admin')) {
+                            this.player.is_admin = data.player.is_admin;
+                            console.log('[ADMIN DEBUG] Updated is_admin from socket to:', this.player.is_admin);
+                        } else {
+                            console.log('[ADMIN DEBUG] Socket data missing is_admin, preserving existing value:', this.player.is_admin);
+                        }
+
+                        if (data.player.stats) {
+                            this.player.stats = {
+                                STR: data.player.stats.str || 10,
+                                AGI: data.player.stats.agi || 10,
+                                VIT: data.player.stats.vit || 10,
+                                INT: data.player.stats.int || 10,
+                                DEX: data.player.stats.dex || 10,
+                                LUK: data.player.stats.luk || 10
+                            };
+                        }
+
+                        this.updateUI();
+                        this.updateAdminPanel();
+                    }
+                });
+
+                this.socket.on('authError', (data) => {
+                    console.error('Authentication error:', data.message);
+                    this.displayMessage('error', `Authentication failed: ${data.message}`);
+                    // Redirect to login
+                    localStorage.removeItem('auth_token');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                });
+
+                this.socket.on('message', (data) => {
+                    // Handle messages from server
+                    const messageType = data.type || 'game';
+                    this.displayMessage(messageType, data.text);
+                });
+
+                // Handle room updates for mini-map and ASCII art
+                this.socket.on('roomUpdate', (data) => {
+                    console.log('Room update received:', data);
+
+                    // Update mini-map
+                    if (this.miniMap && data.id) {
+                        this.miniMap.update(data);
+                        document.getElementById('roomCount').textContent = this.miniMap.getRoomCount();
+                    }
+
+                    // Update location display
+                    if (data.name) {
+                        this.player.location = data.name;
+                        document.getElementById('currentLocation').textContent = data.name;
+                    }
+
+                    // Update exits display
+                    if (data.exits) {
+                        const exitsList = Object.keys(data.exits).join(', ') || 'none';
+                        document.getElementById('roomExits').textContent = exitsList;
+                    }
+
+                    // Display room with ASCII header
+                    if (data.name && this.asciiRenderer) {
+                        const header = this.asciiRenderer.getRoomHeader(data.id, data.name, data.description || '');
+                        this.displayAsciiArt(header, 'ascii-room');
+                    }
+                });
+
+                this.socket.on('playerUpdate', (data) => {
+                    // Update player stats from server
+                    if (data.hp !== undefined) this.player.hp = data.hp;
+                    if (data.maxHp !== undefined) this.player.maxHP = data.maxHp;
+                    if (data.mp !== undefined) this.player.mp = data.mp;
+                    if (data.maxMp !== undefined) this.player.maxMP = data.maxMp;
+                    if (data.level !== undefined) this.player.level = data.level;
+                    if (data.experience !== undefined) this.player.exp = data.experience;
+                    if (data.expToNext !== undefined) this.player.expNext = data.expToNext;
+
+                    this.updateUI();
+                });
+
+                this.socket.on('error', (error) => {
+                    console.error('Socket error:', error);
+                    this.displayMessage('error', 'An error occurred with the connection.');
+                });
+            }
+            
+            updateConnectionStatus() {
+                const statusEl = document.querySelector('.connection-status');
+                if (this.isConnected) {
+                    statusEl.textContent = 'Connected';
+                    statusEl.className = 'connection-status connected';
+                } else {
+                    statusEl.textContent = 'Disconnected';
+                    statusEl.className = 'connection-status disconnected';
+                }
+            }
+            
+            handleCommand(command) {
+                if (!command) return;
+
+                this.commandHistory.unshift(command);
+                if (this.commandHistory.length > 50) {
+                    this.commandHistory.pop();
+                }
+                this.historyIndex = -1;
+
+                this.displayMessage('player-input', `> ${command}`);
+
+                // Send command to server via Socket.IO
+                if (this.socket && this.isConnected) {
+                    this.socket.emit('command', { command: command });
+                } else {
+                    this.displayMessage('error', 'Not connected to server. Please refresh the page.');
+                }
+
+                this.saveGameData();
+            }
+            
+            navigateHistory(direction) {
+                if (this.commandHistory.length === 0) return;
+                
+                this.historyIndex += direction;
+                
+                if (this.historyIndex < 0) {
+                    this.historyIndex = -1;
+                    document.getElementById('commandInput').value = '';
+                } else if (this.historyIndex >= this.commandHistory.length) {
+                    this.historyIndex = this.commandHistory.length - 1;
+                }
+                
+                if (this.historyIndex >= 0) {
+                    document.getElementById('commandInput').value = this.commandHistory[this.historyIndex];
+                }
+            }
+            
+            displayMessage(type, message) {
+                const output = document.getElementById('gameOutput');
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type} message-new`;
+                messageEl.textContent = message;
+                output.appendChild(messageEl);
+                output.scrollTop = output.scrollHeight;
+            }
+
+            displayAsciiArt(asciiText, cssClass = 'ascii-art') {
+                const output = document.getElementById('gameOutput');
+                const artEl = document.createElement('div');
+                artEl.className = `message ${cssClass}`;
+                artEl.style.whiteSpace = 'pre';
+                artEl.style.fontFamily = 'monospace';
+                artEl.style.lineHeight = '1.2';
+                artEl.textContent = asciiText;
+                output.appendChild(artEl);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            updateUI() {
+                // Update character info
+                document.getElementById('playerName').textContent = this.player.name;
+                document.getElementById('playerLevel').textContent = this.player.level;
+                document.getElementById('playerClass').textContent = this.player.class;
+                document.getElementById('playerExp').textContent = this.player.exp;
+                document.getElementById('playerExpNext').textContent = this.player.expNext;
+                
+                // Update health/mana
+                document.getElementById('currentHP').textContent = this.player.hp;
+                document.getElementById('maxHP').textContent = this.player.maxHP;
+                document.getElementById('currentMP').textContent = this.player.mp;
+                document.getElementById('maxMP').textContent = this.player.maxMP;
+                
+                // Update bars
+                const hpPercent = (this.player.hp / this.player.maxHP) * 100;
+                const mpPercent = (this.player.mp / this.player.maxMP) * 100;
+                document.getElementById('hpBar').style.width = `${hpPercent}%`;
+                document.getElementById('mpBar').style.width = `${mpPercent}%`;
+                
+                // Update stats
+                Object.entries(this.player.stats).forEach(([stat, value]) => {
+                    document.getElementById(`stat${stat}`).textContent = value;
+                });
+                
+                // Update location
+                this.updateLocationDisplay();
+            }
+            
+            updateLocationDisplay() {
+                document.getElementById('currentLocation').textContent = this.player.location;
+            }
+            
+            updateOnlinePlayers(players) {
+                const container = document.getElementById('onlinePlayers');
+                container.innerHTML = '';
+
+                players.forEach(player => {
+                    const playerEl = document.createElement('div');
+                    playerEl.className = 'player-name';
+                    playerEl.textContent = player;
+                    playerEl.onclick = () => {
+                        if (!player.includes('(You)')) {
+                            document.getElementById('commandInput').value = `whisper ${player.split(' ')[0]} `;
+                            document.getElementById('commandInput').focus();
+                        }
+                    };
+                    container.appendChild(playerEl);
+                });
+
+                document.getElementById('playerCount').textContent = players.length;
+
+                // Update admin panel player count if visible
+                if (this.player.is_admin) {
+                    document.getElementById('adminTotalPlayers').textContent = players.length;
+                }
+            }
+
+            updateAdminPanel() {
+                const adminPanel = document.getElementById('adminPanel');
+                console.log('[ADMIN DEBUG] updateAdminPanel called. is_admin =', this.player.is_admin);
+
+                if (this.player.is_admin === true) {
+                    console.log('[ADMIN DEBUG] Showing admin panel');
+                    adminPanel.classList.remove('hidden');
+                    this.displayMessage('system', '🛡️ Admin controls activated');
+                } else {
+                    console.log('[ADMIN DEBUG] Hiding admin panel. is_admin value:', this.player.is_admin);
+                    adminPanel.classList.add('hidden');
+                }
+            }
+
+            adminCommand(command) {
+                if (!this.player.is_admin) {
+                    this.displayMessage('error', 'Admin access required');
+                    return;
+                }
+                this.handleCommand(command);
+            }
+
+            adminBroadcast() {
+                if (!this.player.is_admin) {
+                    this.displayMessage('error', 'Admin access required');
+                    return;
+                }
+                const message = prompt('Enter broadcast message:');
+                if (message) {
+                    this.handleCommand(`admin broadcast ${message}`);
+                }
+            }
+
+            adminKickPlayer() {
+                if (!this.player.is_admin) {
+                    this.displayMessage('error', 'Admin access required');
+                    return;
+                }
+                const playerName = prompt('Enter player name to kick:');
+                if (playerName) {
+                    this.handleCommand(`admin kick ${playerName}`);
+                }
+            }
+        }
+        
+        // Initialize game IMMEDIATELY - no waiting
+        const game = new MUDClient();
+
+        // Global functions for login buttons
+        function login() {
+            game.login();
+        }
+
+        function register() {
+            game.register();
+        }
+        
+        // Update game time
+        setInterval(() => {
+            const times = ['Morning', 'Midday', 'Afternoon', 'Evening', 'Night', 'Midnight'];
+            const currentTime = times[Math.floor(Date.now() / 10000) % times.length];
+            document.getElementById('gameTime').textContent = `Day ${Math.floor(Date.now() / 60000) + 1}, ${currentTime}`;
+        }, 10000);
+    </script>
+</body>
+</html>
