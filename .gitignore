@@ -1,102 +1,72 @@
-# Dependencies
+# --- Dependencies & build artifacts ---
 node_modules/
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+.npm
+.eslintcache
+*.tgz
+*.tar.gz
+build/
+dist/
+.cache
+.parcel-cache
+coverage/
+.nyc_output/
+test-results/
 
-# Environment files
+# --- Environment / secrets (never commit) ---
 .env
-.env.local
-.env.development
-.env.test
-.env.production
 .env.*
+!.env.example
 
-# Logs
+# --- Credentials, certs, keys ---
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# --- Operational scripts (should not live in source repo) ---
+# Decision: shell scripts contain environment-specific paths, sudo
+# operations, and have historically leaked plaintext credentials.
+# Keep them out of the public repo. See docs/DECISIONS.md.
+*.sh
+
+# --- SQL files that touch credentials ---
+# Catch-all for the credential-rotation pattern that leaked in the
+# May 2026 incident. See docs/SECURITY_INCIDENT_2026-05.md.
+*password*.sql
+*-creds*.sql
+fix-db-*.sql
+
+# --- Database / backups ---
+*.sqlite
+*.db
+*.backup
+*.bak
+backup/
+backups/
+*.dump
+
+# --- Logs / runtime ---
 logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
+sessions/
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-dist
-
-# Gatsby files
-.cache/
-/public
-
-# But include app/public (game client files)
-!app/public/
-
-# Storybook build outputs
-.out
-.storybook-out
-
-# Temporary folders
-tmp/
-temp/
-
-# Editor directories and files
+# --- Editor / OS ---
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -105,33 +75,9 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Database files
-*.sqlite
-*.db
-
-# Backup files
-*.backup
-*.bak
-backup/
-backups/
-
-# SSL certificates and keys
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-
-# Session files
-sessions/
-
-# Build artifacts
-build/
-dist/
-*.tgz
-*.tar.gz
-
-# Test artifacts
-coverage/
-.nyc_output/
-test-results/
+# --- Media that bloats the repo ---
+# Walkthroughs and feature recordings live in releases / external storage,
+# not in source. See docs/PORTFOLIO_MANAGEMENT.md for hosting decisions.
+*.mp4
+*.mov
+Screenshot*.png
