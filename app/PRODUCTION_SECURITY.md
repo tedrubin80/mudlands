@@ -12,12 +12,12 @@
 All default passwords have been replaced with cryptographically secure values:
 
 ```
-Session Secret: [REDACTED]
+Session Secret: [REDACTED — see docs/SECURITY_INCIDENT_2026-05.md]
 CSRF Secret:    [REDACTED]
 JWT Secret:     [REDACTED]
 DB Password:    [REDACTED]
 Admin Password: [REDACTED]
-Admin Username: mudlands_admin
+Admin Username: [REDACTED]
 ```
 
 **⚠️ IMPORTANT**: Store these passwords securely and never commit them to version control!
@@ -111,7 +111,7 @@ Content-Security-Policy: [restrictive policy]
 4. **Set Up PostgreSQL**
    ```bash
    sudo -u postgres psql
-   CREATE USER mudlands WITH PASSWORD '[REDACTED]';
+   CREATE USER mudlands WITH PASSWORD '<REDACTED>';
    CREATE DATABASE mudlands OWNER mudlands;
    GRANT ALL PRIVILEGES ON DATABASE mudlands TO mudlands;
    \q

@@ -120,7 +120,7 @@
 - [ ] Fix broadcast messaging system (connect to actual game broadcast)
 
 ### ❌ Database & Security Issues
-- [ ] Restore complex database password (currently using [REDACTED] - security risk)
+- [ ] Restore complex database password (currently using a weak baseline - security risk)
 - [ ] Test all database operations with complex password
 - [ ] Ensure CSRF tokens work consistently across all forms
 - [ ] Fix Express rate limiting trust proxy warnings
@@ -192,12 +192,12 @@ Player (role_id: 0) - Standard game access
 
 ### 🔐 Current Admin Credentials
 - **Email**: [REDACTED]
-- **Username**: mudlands_admin
-- **Password**: [REDACTED]
+- **Username**: [REDACTED]
+- **Password**: [REDACTED — see docs/SECURITY_INCIDENT_2026-05.md]
 - **Admin Panel**: https://mudlands.online/admin
 
 ### 🗄️ Database Info
-- **Current Password**: [REDACTED] ⚠️ (needs to be changed to complex)
+- **Current Password**: [REDACTED — weak baseline, see incident doc]
 - **User**: mudlands_user
 - **Database**: mudlands
 - **Host**: 127.0.0.1:5432

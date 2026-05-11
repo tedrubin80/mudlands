@@ -10,9 +10,13 @@ const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../src/config/database');
 
 async function createAdmin() {
-    const adminEmail = process.env.ADMIN_EMAIL || '[REDACTED]';
-    const adminUsername = process.env.ADMIN_USERNAME || 'mudlands_admin'; 
-    const adminPassword = process.env.ADMIN_PASSWORD || '[REDACTED]';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminUsername = process.env.ADMIN_USERNAME;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminEmail || !adminUsername || !adminPassword) {
+        console.error('ADMIN_EMAIL, ADMIN_USERNAME, and ADMIN_PASSWORD must be set in the environment.');
+        process.exit(1);
+    }
     
     console.log('Creating admin user...');
     console.log('Email:', adminEmail);

@@ -7,8 +7,8 @@ All passwords and cryptographic secrets have been updated to use cryptographical
 
 ### 1. Database Security
 - **PostgreSQL Password**: Updated to 48-character hex string (192 bits entropy)
-  - Old: `[REDACTED]` (weak)
-  - New: `[REDACTED]`
+  - Old: `[REDACTED — weak baseline]`
+  - New: `[REDACTED — see docs/SECURITY_INCIDENT_2026-05.md]`
 
 ### 2. Admin Account Security
 - **Admin Password**: Updated to strong alphanumeric + special characters
@@ -51,7 +51,7 @@ All passwords exceed NIST recommendations for cryptographic security.
 
 ### Admin Panel Access
 - URL: `https://mudlands.online/admin`
-- Username: `mudlands_admin`
+- Username: `[REDACTED]`
 - Password: `[REDACTED]`
 - Email: `[REDACTED]`
 

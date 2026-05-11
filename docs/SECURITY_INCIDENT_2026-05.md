@@ -15,10 +15,10 @@ A pre-decommission audit of the public GitHub repository `tedrubin80/mudlands` f
 
 | File | Exposed value |
 |---|---|
-| `app/fix-db-password.sql` | Postgres `mudlands_user` password: `[REDACTED]` |
-| `app/scripts/update-db-password.sql` | Postgres `mudlands_user` password: `[REDACTED]` |
+| `app/fix-db-password.sql` | Postgres `mudlands_user` password (32-char, [REDACTED]) |
+| `app/scripts/update-db-password.sql` | Postgres `mudlands_user` password, rotated value ([REDACTED]) |
 | `app/scripts/secure-database.sh` | Same password as above + `sed` replacement of `.env` |
-| `app/scripts/setup-admin.sh` | Admin user password: `[REDACTED]` (also `[REDACTED]` baseline DB pwd) |
+| `app/scripts/setup-admin.sh` | Admin user password ([REDACTED]) and baseline DB password ([REDACTED]) |
 
 Additionally, **19 shell scripts** were committed to the repo. They didn't all contain credentials, but they encoded server paths, sudo operations, and deployment topology that have no business in a public source tree.
 
@@ -48,7 +48,7 @@ A few independent failures overlapped:
 
 - The Postgres database referenced by these credentials had been wiped.
 - The `mudlands_user` Postgres role was deleted.
-- The admin account using `[REDACTED]` was deleted.
+- The exposed admin account was deleted.
 - The host running the application was being torn down.
 
 **If the site had been live**, these would have been:
@@ -69,16 +69,20 @@ The window of exposure is unknown but at least months. Search-engine and credent
 3. ✅ Updated `.gitignore` (project root) to exclude `*.sh`, `*password*.sql`, `*-creds*.sql`, `fix-db-*.sql` going forward.
 4. ✅ Documented the `.gitignore` rule and its rationale in `docs/DECISIONS.md → D-010`.
 
-### Not done (intentional, project decommissioned)
+### Done in the follow-up scrub (2026-05-11)
 
-The following would be required if the project were live; they are deliberately skipped because the system is no longer operating:
+After leaving the credentials in the public history initially "for the record," the position was reversed: a public archive should not ship plaintext credentials regardless of whether the accounts are still alive. The follow-up scrub:
+
+- ✅ Removed `app/fix-db-password.sql`, `app/scripts/update-db-password.sql`, `app/scripts/secure-database.sh`, and `app/scripts/setup-admin.sh` from HEAD and from history via `git filter-repo --invert-paths --path ...`.
+- ✅ Removed the 24 MB server-snapshot tarball `archives/mudlands_final_archive_20250926_173034.tar.gz` from HEAD and history (it contained a nested `.git/` directory with the same secrets, plus `node_modules`, nginx configs, and `.claude/settings.local.json`).
+- ✅ Redacted concrete credentials, admin emails, and the hardcoded password fallbacks from `app/PRODUCTION_SECURITY.md`, `app/SECURITY_UPDATE.md`, `app/TODO.md`, `app/src/routes/admin.js`, `app/scripts/create-admin.js`, and this incident document.
+- ✅ Used `git filter-repo --replace-text` to substitute the literal credential strings with `[REDACTED]` across every blob in history.
+- ✅ Force-pushed the rewritten `main` to `origin`. GitHub forks, Wayback snapshots, and credential-scraper caches cannot be retracted.
+
+### Still not done (intentional, project decommissioned)
 
 - ❌ Rotate the exposed credentials. Not applicable — accounts no longer exist.
-- ❌ Rewrite git history with `git filter-repo` to purge the secret blobs.
-- ❌ Force-push the rewritten history to GitHub.
-- ❌ Notify any third parties or users.
-
-The compromised credentials are retained in the public history of `tedrubin80/mudlands` as part of the historical record. This is intentional — anyone reviewing this repo as portfolio work should be able to see the incident and the fix together.
+- ❌ Notify users. PII was not in repo content, and no live system remains.
 
 ### What we'd do on a live system
 
@@ -86,13 +90,14 @@ Documented here for "next time," and for any reviewer evaluating the security th
 
 1. **Rotate first, investigate second.** Generate new credentials, update them in the running app, restart, before doing anything else.
 2. **Assume compromise.** Audit the database for unauthorized writes/reads in the suspected exposure window. Check Postgres logs.
-3. **Rewrite history.**
+3. **Rewrite history.** This is what was eventually done here; see "Done in the follow-up scrub" above. The command shape:
    ```bash
    git filter-repo --invert-paths \
      --path app/fix-db-password.sql \
      --path app/scripts/update-db-password.sql \
      --path app/scripts/secure-database.sh \
      --path app/scripts/setup-admin.sh
+   git filter-repo --replace-text replacements.txt   # for residual mentions in docs
    git push --force-with-lease origin main
    ```
    Note: this only purges from the default-branch reachable history. GitHub forks and cached views (Wayback, etc.) cannot be retracted.

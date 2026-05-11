@@ -15,10 +15,13 @@ const { pool } = require('../config/database');
 function createAdminRouter(gameEngine) {
     const router = express.Router();
 
-// Admin credentials from environment
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '[REDACTED]';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'mudlands_admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '[REDACTED]';
+// Admin credentials from environment (no plaintext fallbacks — fail closed)
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_EMAIL || !ADMIN_USERNAME || !ADMIN_PASSWORD) {
+    throw new Error('ADMIN_EMAIL, ADMIN_USERNAME, and ADMIN_PASSWORD must be set in the environment');
+}
 
 /**
  * Admin authentication middleware
